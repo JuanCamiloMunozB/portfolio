@@ -12,9 +12,9 @@ const SLUG: Record<string, string> = {
   'Google Cloud': 'googlecloud', 'Cloud Run': 'googlecloud', Prometheus: 'prometheus', Grafana: 'grafana', Jaeger: 'jaeger',
   SonarQube: 'sonarqubeserver', Trivy: 'trivy', Linux: 'linux', JUnit: 'junit5', Jest: 'jest', Pytest: 'pytest',
   Postman: 'postman', Locust: 'locust', 'scikit-learn': 'scikitlearn', Optuna: 'optuna', NumPy: 'numpy', OpenCV: 'opencv',
-  MediaPipe: 'mediapipe', Streamlit: 'streamlit', Vercel: 'vercel',
+  MediaPipe: 'mediapipe', Streamlit: 'streamlit', Vercel: 'vercel', Render: 'render',
 };
-const ALIAS: Record<string, string> = { 'AWS Cognito': 'AWS' };
+const ALIAS: Record<string, string> = {};
 const bySlug: Record<string, string> = Object.fromEntries(Object.values(si).filter((x: any) => x && x.slug).map((x: any) => [x.slug, x.path]));
 
 export function logo(name: string): { viewBox: string; d: string } | null {

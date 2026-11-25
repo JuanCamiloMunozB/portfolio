@@ -29,7 +29,6 @@ for (const n of diagram.nodes) {
 }
 const H = (n: DNode) => n.h ?? 52;
 const pathEdges = diagram.edges.filter((e) => (e.kind ?? 'dep') !== 'assembly');
-const packets = diagram.edges.filter((e) => e.arrow !== false && (e.kind === 'path' || (e.kind ?? 'dep') === 'dep'));
 ---
 <figure class="diagram">
   <svg viewBox={`0 0 ${W} ${diagram.h}`} role="img" aria-labelledby={`${id}-t ${id}-d`}>
@@ -95,11 +94,6 @@ const packets = diagram.edges.filter((e) => e.arrow !== false && (e.kind === 'pa
       );
     })}
 
-    {packets.map((e, i) => (
-      <rect class="u-packet" x="-3.5" y="-3.5" width="7" height="7">
-        <animateMotion dur="2.6s" begin={`-${(i * 0.5) % 2.6}s`} repeatCount="indefinite" path={e.d} />
-      </rect>
-    ))}
   </svg>
   <figcaption>{tx(diagram.caption, lang)}</figcaption>
   <ul class="u-legend" aria-hidden="true">

@@ -4,16 +4,17 @@ import Scene from './Scene.astro';
 import Diagram from './Diagram.astro';
 import Prompt from './Prompt.astro';
 import { logo } from '../data/logos';
-import { t, tx, num, type Lang } from '../i18n/ui';
+import { t, tx, num, fmt, type Lang } from '../i18n/ui';
 import { SITE, localized } from '../data/site';
-import { featured, type Project } from '../data/projects';
+import { withCase, type Project } from '../data/projects';
 
 interface Props { lang: Lang; project: Project }
 const { lang, project: p } = Astro.props;
 const cs = p.case!;
 const title = tx(p.title, lang);
-const idx = featured.findIndex((x) => x.slug === p.slug);
-const nextP = featured[(idx + 1) % featured.length];
+const idx = withCase.findIndex((x) => x.slug === p.slug);
+const nextP = withCase[(idx + 1) % withCase.length];
+const f = (x: { en: string; es: string }) => fmt(tx(x, lang));
 const suffix = p.metric?.suffix === '%' && lang === 'es' ? ' %' : p.metric?.suffix ?? '';
 const pct = (v: number, sfx?: string) => (sfx === '%' && lang === 'es' ? ' %' : sfx ?? '');
 const stackTiles = cs.stack.map((n) => ({ name: n, logo: logo(n) }));
@@ -25,18 +26,18 @@ const subject = encodeURIComponent(`${lang === 'es' ? 'Sobre' : 'About'} ${title
       <a class="back" href={`${localized(lang)}#work`}>&lt; {t('csBack', lang)}</a>
       <div style="margin-top:28px"><Prompt cmd={`cat ${p.slug}.md`} path="~/projects" /></div>
       <h1>{title}</h1>
-      <p class="lead">{tx(p.caption, lang)} {p.inProgress && <span class="status">{t('inProgress', lang)}</span>}</p>
+      <p class="lead">{tx(p.caption, lang)}</p>
       <div class="cs-top">
         <div class="art"><Scene name={p.scene} label={tx(p.sceneLabel, lang)} /></div>
         <dl class="credits">
-          <div class="wide"><dt>{t('csRole', lang)}</dt><dd>{tx(cs.role, lang)}</dd></div>
+          <div class="wide"><dt>{t('csRole', lang)}</dt><dd set:html={f(cs.role)} /></div>
           <div class="wide"><dt>{t('csPeriod', lang)}</dt><dd>{tx(p.period, lang)}</dd></div>
           {p.metric && <div class="wide metricbox"><dt>{tx(p.metric.label, lang)}</dt><dd><b data-count={p.metric.value} data-dec={p.metric.decimals ?? 0} data-suffix={suffix}>{num(p.metric.value, lang, p.metric.decimals ?? 0)}{suffix}</b></dd></div>}
           <div class="wide"><dt>{t('repo', lang)}</dt><dd>
             {p.repo && <a href={p.repo}>{p.repo.replace('https://github.com/', '')}</a>}
             {p.repo2 && <><br /><a href={p.repo2}>{p.repo2.replace('https://github.com/', '')}</a></>}
             {p.privateRepo && <span>{t('privateRepo', lang)}</span>}
-            {p.live && <a href={p.live}>{t('live', lang)}</a>}
+            {p.live && <><br /><a href={p.live}>{p.liveLabel ? tx(p.liveLabel, lang) : t('live', lang)}</a></>}
           </dd></div>
         </dl>
       </div>
@@ -47,7 +48,7 @@ const subject = encodeURIComponent(`${lang === 'es' ? 'Sobre' : 'About'} ${title
     <section class="cs-sec">
       <Prompt cmd="cat goal.md" path={`~/projects/${p.slug}`} />
       <h2>{t('csGoal', lang)}</h2>
-      <p class="goal">{tx(cs.goal, lang)}</p>
+      <p class="goal" set:html={f(cs.goal)} />
     </section>
 
     <section class="cs-sec">
@@ -65,14 +66,41 @@ const subject = encodeURIComponent(`${lang === 'es' ? 'Sobre' : 'About'} ${title
             <div class="route">#{String(i + 1).padStart(2, '0')}</div>
             <h3>{tx(d.title, lang)}</h3>
             <dl>
-              <dt>{t('csChose', lang)}</dt><dd>{tx(d.chose, lang)}</dd>
-              <dt>{t('csWhy', lang)}</dt><dd>{tx(d.why, lang)}</dd>
-              <dt>{t('csCost', lang)}</dt><dd class="cost">{tx(d.cost, lang)}</dd>
+              <dt>{t('csChose', lang)}</dt><dd set:html={f(d.chose)} />
+              <dt>{t('csWhy', lang)}</dt><dd set:html={f(d.why)} />
+              <dt>{t('csCost', lang)}</dt><dd class="cost" set:html={f(d.cost)} />
             </dl>
           </article>
         ))}
       </div>
     </section>
+
+    {cs.transitions && (
+      <section class="cs-sec">
+        <Prompt cmd="cat transitions.tsv" path={`~/projects/${p.slug}`} />
+        <h2>{t('csTransitions', lang)}</h2>
+        <div class="tt-wrap">
+          <table class="tt">
+            <thead><tr><th>{t('ttFrom', lang)}</th><th>{t('ttEvent', lang)}</th><th>{t('ttTo', lang)}</th></tr></thead>
+            <tbody>
+              {cs.transitions.map((r) => (
+                <tr class={r.noop ? 'noop' : ''}>
+                  <td><code>{r.from}</code></td>
+                  <td set:html={f(r.event)} />
+                  <td><code>{r.to}</code>{r.noop && <span class="noop-tag">{t('ttNoop', lang)}</span>}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    )}
+
+    {cs.figure && (
+      <section class="cs-sec">
+        <figure class="shot"><img src={cs.figure.src} alt={tx(cs.figure.alt, lang)} loading="lazy" /><figcaption>{tx(cs.figure.caption, lang)}</figcaption></figure>
+      </section>
+    )}
 
     {cs.stats && (
       <section class="cs-sec">
@@ -81,7 +109,7 @@ const subject = encodeURIComponent(`${lang === 'es' ? 'Sobre' : 'About'} ${title
         <div class="stats">
           {cs.stats.map((st) => (
             <div class="stat reveal">
-              <span class="pass">PASS</span>
+              {st.gate && <span class="pass">PASS</span>}
               <b>{st.prefix}<span data-count={st.value} data-dec={st.decimals ?? 0} data-suffix={pct(st.value, st.suffix)}>{num(st.value, lang, st.decimals ?? 0)}{pct(st.value, st.suffix)}</span></b>
               <span class="lbl2">{tx(st.label, lang)}</span>
               {st.of && (
@@ -92,7 +120,7 @@ const subject = encodeURIComponent(`${lang === 'es' ? 'Sobre' : 'About'} ${title
             </div>
           ))}
         </div>
-        {cs.notes && <ul class="cs-list notes">{cs.notes.map((r) => <li>{tx(r, lang)}</li>)}</ul>}
+        {cs.notes && <ul class="cs-list notes">{cs.notes.map((r) => <li set:html={f(r)} />)}</ul>}
       </section>
     )}
 
@@ -110,12 +138,12 @@ const subject = encodeURIComponent(`${lang === 'es' ? 'Sobre' : 'About'} ${title
     <section class="cs-sec">
       <Prompt cmd="cat TODO.md" path={`~/projects/${p.slug}`} />
       <h2>{t('csNext', lang)}</h2>
-      <ul class="cs-list">{cs.next.map((n) => <li>{tx(n, lang)}</li>)}</ul>
+      <ul class="cs-list">{cs.next.map((n) => <li set:html={f(n)} />)}</ul>
     </section>
 
     <div class="cs-next">
       <a class="btn btn-primary" href={`mailto:${SITE.email}?subject=${subject}`}>{t('csAsk', lang)}</a>
-      <a class="nextp" href={localized(lang, `work/${nextP.slug}/`)}><small>{t('csNextTrack', lang)}</small><b>{tx(nextP.title, lang)} /&gt;</b></a>
+      <a class="nextp" href={localized(lang, `work/${nextP.slug}/`)}><small>{t('csNextTrack', lang)}</small><b>{tx(nextP.title, lang)}</b></a>
     </div>
   </div>
 </Base>

@@ -3,8 +3,9 @@
  * Animated pixel scenes. Each one shows what a project, certification or skill area
  * does, drawn only with palette tokens so it follows the theme.
  */
-interface Props { name: string; label?: string }
-const { name, label } = Astro.props;
+interface Props { name: string; label?: string; lang?: 'en' | 'es' }
+const { name, label, lang = 'en' } = Astro.props;
+const es = lang === 'es';
 const role = label ? 'img' : undefined;
 const hidden = label ? undefined : 'true';
 
@@ -15,6 +16,17 @@ const pts = (v: number[]) => v.map((k, i) => `${(48 + AXES[i][0] * k).toFixed(1)
 const RADAR_A = pts([0.8, 0.7, 0.35, 0.75, 0.6, 0.65]);
 const RADAR_B = pts([0.85, 0.75, 0.75, 0.8, 0.65, 0.7]);
 const GAP_A = [48 + 22.5 * 0.35, 30 + 13 * 0.35], GAP_B = [48 + 22.5 * 0.75, 30 + 13 * 0.75];
+// Cloud for the Google Cloud scene, shaped like its logo: a large dome on the right, a smaller lobe on the left,
+// a flat base with rounded ends and a thick outline in four segments. Rasterized on a 2-unit grid.
+const inCloud = (x: number, y: number) =>
+  (x - 52) ** 2 + (y - 26) ** 2 <= 22 ** 2 || (x - 25) ** 2 + (y - 36) ** 2 <= 13 ** 2 ||
+  (x >= 18 && x <= 72 && y >= 34 && y <= 56) || (x - 18) ** 2 + (y - 45) ** 2 <= 11 ** 2 || (x - 72) ** 2 + (y - 45) ** 2 <= 11 ** 2;
+const seg = (x: number, y: number) => { const a = Math.atan2(y - 38, x - 46) * 180 / Math.PI; return a < -135 || a > 150 ? 'm' : a < -40 ? 'a' : a < 60 ? 'i' : 'sb'; };
+const CLOUD: { x: number; y: number; c: string }[] = [];
+for (let y = 2; y < 58; y += 2) for (let x = 4; x < 86; x += 2) if (inCloud(x, y) && y <= 56) {
+  const edge = ![[4, 0], [-4, 0], [0, 4], [0, -4], [3, 3], [-3, 3], [3, -3], [-3, -3]].every(([dx, dy]) => inCloud(x + dx, y + dy) && y + dy <= 56);
+  CLOUD.push({ x, y, c: edge ? seg(x, y) : 's' });
+}
 ---
 {name === 'circleguard' && (
   <svg class="px" viewBox="0 0 120 60" role={role} aria-label={label} aria-hidden={hidden}>
@@ -86,12 +98,19 @@ const GAP_A = [48 + 22.5 * 0.35, 30 + 13 * 0.35], GAP_B = [48 + 22.5 * 0.75, 30 
 
 {name === 'ciencia' && (
   <svg class="px" viewBox="0 0 150 60" role={role} aria-label={label} aria-hidden={hidden}>
-    <g class="bob"><rect class="m" x="10" y="16" width="16" height="2" /><rect class="m" x="10" y="30" width="16" height="2" /><rect class="m" x="8" y="18" width="2" height="12" /><rect class="m" x="26" y="18" width="2" height="12" /><rect class="m" x="27" y="32" width="3" height="3" /><rect class="m" x="30" y="35" width="3" height="3" /></g>
+    <rect class="ls" x="4" y="14" width="36" height="14" /><rect class="s2" x="5" y="15" width="34" height="12" />
+    <rect class="typeline m" x="8" y="20" width="18" height="2" />
+    <g><rect class="a" x="29" y="17" width="6" height="1" /><rect class="a" x="28" y="18" width="1" height="4" /><rect class="a" x="35" y="18" width="1" height="4" /><rect class="a" x="29" y="22" width="6" height="1" /><rect class="a" x="35" y="23" width="2" height="2" /></g>
+    <text class="lbl" x="22" y="10">{es ? 'consulta' : 'query'}</text>
+    <g><rect class="ls" x="8" y="38" width="28" height="4" /><rect class="ls" x="10" y="43" width="24" height="4" /><rect class="ls" x="12" y="48" width="20" height="4" /></g>
+    <text class="lbl" x="22" y="58">108k</text>
+    <line class="wire flow" x1="40" y1="21" x2="47" y2="21" /><line class="wire flow" x1="36" y1="45" x2="47" y2="45" />
+    {[1, 2, 3, 4].map((n, i) => <text class="lbl" x="53" y={15 + i * 13}>{n}</text>)}
     <g>
-      <g class="rr-down"><rect class="s2" x="48" y="8" width="92" height="10" /><rect class="m" x="52" y="12" width="40" height="2" /></g>
-      <g class="rr-down"><rect class="s2" x="48" y="21" width="92" height="10" /><rect class="m" x="52" y="25" width="30" height="2" /></g>
-      <g class="rr-up"><rect class="as" x="48" y="34" width="92" height="10" style="stroke:var(--accent);stroke-width:1" /><rect class="a" x="52" y="38" width="48" height="2" /></g>
-      <rect class="s2" x="48" y="47" width="92" height="10" /><rect class="m" x="52" y="51" width="24" height="2" />
+      <g class="rr-down"><rect class="s2" x="58" y="8" width="88" height="10" /><rect class="m" x="62" y="12" width="40" height="2" /></g>
+      <g class="rr-down"><rect class="s2" x="58" y="21" width="88" height="10" /><rect class="m" x="62" y="25" width="30" height="2" /></g>
+      <g class="rr-up"><rect class="as" x="58" y="34" width="88" height="10" style="stroke:var(--accent);stroke-width:1" /><rect class="a" x="62" y="38" width="48" height="2" /><rect class="a" x="138" y="37" width="4" height="4" /></g>
+      <rect class="s2" x="58" y="47" width="88" height="10" /><rect class="m" x="62" y="51" width="24" height="2" />
     </g>
   </svg>
 )}
@@ -128,16 +147,19 @@ const GAP_A = [48 + 22.5 * 0.35, 30 + 13 * 0.35], GAP_B = [48 + 22.5 * 0.75, 30 
 
 {name === 'pipeline' && (
   <svg class="px" viewBox="0 0 150 60" role={role} aria-label={label} aria-hidden={hidden}>
+    <rect x="121.5" y="8.5" width="25" height="45" fill="none" stroke="var(--line-strong)" />
+    {['build', 'test', 'push'].map((h, c) => <text class="lbl" x={47 + c * 24} y="7">{h}</text>)}
     {['go', 'node', 'java'].map((lang, r) => (
       <g>
-        <text class="lbl" x="14" y={15 + r * 17} style="text-anchor:start">{lang}</text>
-        <line class="wire flow" x1="34" y1={13 + r * 17} x2="112" y2={13 + r * 17} />
+        <text class="lbl" x="6" y={18 + r * 15} style="text-anchor:start">{lang}</text>
+        <line class="wire flow" x1="30" y1={16 + r * 15} x2="118" y2={16 + r * 15} />
         {[0, 1, 2].map((c) => (
-          <rect class="stage" style={`animation-delay:${c * 0.6 + r * 0.2}s`} x={40 + c * 24} y={8 + r * 17} width="14" height="10" />
+          <rect class="stage" style={`animation-delay:${c * 0.6 + r * 0.2}s`} x={40 + c * 24} y={11 + r * 15} width="14" height="10" />
         ))}
+        <g class="boot" style={`animation-delay:${1.8 + r * 0.2}s`}><rect class="a" x="124" y={11 + r * 15} width="20" height="10" /><rect class="ai" x="127" y={14 + r * 15} width="3" height="4" /><rect class="ai" x="132" y={15 + r * 15} width="9" height="1" /><rect class="ai" x="132" y={17 + r * 15} width="6" height="1" /></g>
       </g>
     ))}
-    <g class="bob"><rect class="a" x="118" y="18" width="24" height="22" /><rect class="ai" x="118" y="24" width="24" height="1" /><rect class="ai" x="118" y="30" width="24" height="1" /><rect class="ai" x="124" y="18" width="1" height="22" /><rect class="ai" x="135" y="18" width="1" height="22" /></g>
+    <text class="lbl" x="134" y="7">{es ? 'imagen' : 'image'}</text>
   </svg>
 )}
 
@@ -192,15 +214,16 @@ const GAP_A = [48 + 22.5 * 0.35, 30 + 13 * 0.35], GAP_B = [48 + 22.5 * 0.75, 30 
 )}
 {name === 'c-scale' && (
   <svg class="px" viewBox="0 0 90 60" role={role} aria-label={label} aria-hidden={hidden}>
-    <g><rect class="ls" x="6" y="18" width="78" height="38" /><rect class="ls" x="16" y="10" width="26" height="10" /><rect class="ls" x="36" y="4" width="30" height="16" /><rect class="ls" x="62" y="12" width="16" height="8" />
-      <rect class="s" x="7" y="19" width="76" height="36" /><rect class="s" x="17" y="11" width="24" height="9" /><rect class="s" x="37" y="5" width="28" height="15" /><rect class="s" x="63" y="13" width="14" height="7" /></g>
+    <g>{CLOUD.map((c) => <rect class={c.c} x={c.x} y={c.y} width="2" height="2" />)}</g>
+    <g transform="translate(46 37) scale(.68) translate(-45 -36)">
     <g class="boot"><rect x="14" y="28" width="14" height="14" /><rect x="11" y="31" width="3" height="2" /><rect x="11" y="37" width="3" height="2" /><rect x="28" y="31" width="3" height="2" /><rect x="28" y="37" width="3" height="2" /><rect x="17" y="25" width="2" height="3" /><rect x="23" y="25" width="2" height="3" /></g>
     <rect class="b" x="18" y="32" width="6" height="6" />
     <g class="boot" style="animation-delay:.6s"><rect x="39" y="27" width="14" height="3" /><rect x="40" y="30" width="12" height="13" /><rect x="39" y="43" width="14" height="2" /></g>
     <rect class="b" x="42" y="34" width="8" height="1" /><rect class="b" x="42" y="38" width="8" height="1" />
     <g class="wire"><line x1="64" y1="29" x2="74" y2="29" /><line x1="64" y1="29" x2="69" y2="40" /><line x1="74" y1="29" x2="69" y2="40" /></g>
     <g class="boot" style="animation-delay:1.2s"><rect x="61" y="26" width="6" height="6" /><rect x="71" y="26" width="6" height="6" /><rect x="66" y="37" width="6" height="6" /></g>
-    <text class="lbl" x="21" y="52">vm</text><text class="lbl" x="46" y="52">disk</text><text class="lbl" x="69" y="52">net</text>
+    <text class="lbl" x="21" y="52">vm</text><text class="lbl" x="46" y="52">{es ? 'disco' : 'disk'}</text><text class="lbl" x="69" y="52">{es ? 'red' : 'net'}</text>
+    </g>
   </svg>
 )}
 {name === 'c-docs' && (
@@ -211,7 +234,7 @@ const GAP_A = [48 + 22.5 * 0.35, 30 + 13 * 0.35], GAP_B = [48 + 22.5 * 0.75, 30 
     <g class="wire"><line x1="40" y1="30" x2="50" y2="30" /></g>
     <g><rect class="ls" x="56" y="40" width="28" height="10" /><rect class="s2" x="57" y="41" width="26" height="8" /><rect class="ls" x="56" y="29" width="28" height="10" /><rect class="s2" x="57" y="30" width="26" height="8" /></g>
     <g class="file"><rect class="a" x="56" y="18" width="28" height="10" /><rect class="ai" x="60" y="21" width="14" height="1" /><rect class="ai" x="60" y="24" width="10" height="1" /></g>
-    <text class="lbl" x="70" y="57">collection</text>
+    <text class="lbl" x="70" y="57">{es ? 'colección' : 'collection'}</text>
   </svg>
 )}
 {name === 'c-board' && (
@@ -267,11 +290,10 @@ const GAP_A = [48 + 22.5 * 0.35, 30 + 13 * 0.35], GAP_B = [48 + 22.5 * 0.75, 30 
 )}
 {name === 'i-cloud' && (
   <svg class="px" viewBox="0 0 32 32" aria-hidden="true">
-    <g><rect class="ls" x="5" y="6" width="22" height="9" /><rect class="ls" x="9" y="2" width="9" height="5" /><rect class="ls" x="16" y="4" width="7" height="3" />
-      <rect class="s2" x="6" y="7" width="20" height="7" /><rect class="s2" x="10" y="3" width="7" height="4" /><rect class="s2" x="17" y="5" width="5" height="2" /></g>
-    <rect class="a" x="13" y="9" width="6" height="3" />
-    <path class="wire" d="M6 24 C 6 18, 13 18, 16 24 C 19 30, 26 30, 26 24 C 26 18, 19 18, 16 24 C 13 30, 6 30, 6 24 Z" />
-    <rect class="a" x="-1.5" y="-1.5" width="3" height="3"><animateMotion dur="2.66s" repeatCount="indefinite" path="M6 24 C 6 18, 13 18, 16 24 C 19 30, 26 30, 26 24 C 26 18, 19 18, 16 24 C 13 30, 6 30, 6 24 Z" /></rect>
+    <path d="M4 16 C 4 8, 12 8, 16 16 C 20 24, 28 24, 28 16 C 28 8, 20 8, 16 16 C 12 24, 4 24, 4 16 Z" fill="none" stroke="var(--line-strong)" stroke-width="4" />
+    <path class="wire" d="M4 16 C 4 8, 12 8, 16 16 C 20 24, 28 24, 28 16 C 28 8, 20 8, 16 16 C 12 24, 4 24, 4 16 Z" />
+    <rect class="a" x="-2" y="-2" width="4" height="4"><animateMotion dur="3s" repeatCount="indefinite" path="M4 16 C 4 8, 12 8, 16 16 C 20 24, 28 24, 28 16 C 28 8, 20 8, 16 16 C 12 24, 4 24, 4 16 Z" /></rect>
+    <rect class="i" x="-1.5" y="-1.5" width="3" height="3"><animateMotion dur="3s" begin="-1.5s" repeatCount="indefinite" path="M4 16 C 4 8, 12 8, 16 16 C 20 24, 28 24, 28 16 C 28 8, 20 8, 16 16 C 12 24, 4 24, 4 16 Z" /></rect>
   </svg>
 )}
 {name === 'i-product' && (

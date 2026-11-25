@@ -11,8 +11,11 @@ import { tx, t, type Lang } from '../i18n/ui';
 interface Props { area: SkillArea; lang: Lang; evidence: { href: string; title: string }[] }
 const { area, lang, evidence } = Astro.props;
 
-const tiles = area.tools.flatMap((n) => { const l = logo(n); return l ? [{ name: n, ...l }] : []; });
-const tags = area.tools.filter((n) => !tiles.some((x) => x.name === n));
+const tiles = area.tools.map((n) => {
+  const l = logo(n);
+  if (!l) throw new Error(`Skill "${n}" has no logo; add one in src/data/logos.ts or remove it`);
+  return { name: n, ...l };
+});
 ---
 <article class="skill">
   <header>
@@ -21,12 +24,11 @@ const tags = area.tools.filter((n) => !tiles.some((x) => x.name === n));
   </header>
   <ul class="tiles">
     {tiles.map((x) => (
-      <li class="tile" data-tile>
+      <li class={`tile${x.name.split(' ').some((w) => w.length > 10) ? ' long' : ''}`} data-tile>
         <svg viewBox={x.viewBox} aria-hidden="true"><path d={x.d} /></svg>
         <span>{x.name}</span>
       </li>
     ))}
   </ul>
-  {tags.length > 0 && <ul class="concepts">{tags.map((n) => <li>{n}</li>)}</ul>}
   <div class="ev">{t('seenIn', lang)}: {evidence.map((e, i) => <>{i > 0 && ', '}<a href={e.href}>{e.title}</a></>)}</div>
 </article>

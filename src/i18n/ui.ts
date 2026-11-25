@@ -28,18 +28,19 @@ export const ui = {
   cv: { en: 'CV', es: 'CV' },
   downloadCv: { en: 'Download CV', es: 'Descargar CV' },
   cvOther: { en: 'CV en español', es: 'CV in English' },
-  seeWork: { en: 'See my work', es: 'Ver proyectos' },
+  seeWork: { en: 'View Projects', es: 'Ver proyectos' },
   emailMe: { en: 'Email me', es: 'Escríbeme' },
   homeLabel: { en: 'Juan Camilo Muñoz Barco, home', es: 'Juan Camilo Muñoz Barco, inicio' },
 
-  tagline: { en: 'I follow every decision through <em>the whole system.</em>', es: 'Sigo cada decisión a través de <em>todo el sistema.</em>' },
+  roleLine: { en: 'Backend & Distributed Systems Engineer / Final-Year Software Engineering Student', es: 'Desarrollador backend y de sistemas distribuidos / Estudiante de último año de Ingeniería de Sistemas' },
+  buildLine: { en: 'I architect resilient backend services, event-driven pipelines and automated cloud infrastructure, built with Clean Architecture, DDD and automated tests.', es: 'Diseño servicios backend resilientes, pipelines orientados a eventos e infraestructura de nube automatizada, construidos con Clean Architecture, DDD y pruebas automatizadas.' },
+  stackLabel: { en: 'Core stack', es: 'Stack principal' },
   available: { en: 'Open to internships from 2027-1', es: 'Disponible para práctica desde 2027-1' },
   sceneLabel: {
-    en: 'Animated system: a request travels from the user interface through an API, an event stream and a database to a chart.',
-    es: 'Sistema animado: una petición viaja desde la interfaz por una API, un flujo de eventos y una base de datos hasta una gráfica.',
+    en: 'Animated system map: a CI/CD conveyor deploys containers into the cloud; the API, services and AI publish to an event bus; the database feeds an ETL pipeline into a data lake that trains the AI; an ops monitor watches it all.',
+    es: 'Mapa animado del sistema: un transportador de CI/CD despliega contenedores en la nube; la API, los servicios y la IA publican en un bus de eventos; la base de datos alimenta un pipeline ETL hacia un lago de datos que entrena la IA; un monitor de operación lo vigila todo.',
   },
-  sceneHint: { en: 'tap a layer', es: 'toca una capa' },
-  sceneHint2: { en: 'to see what I use there', es: 'para ver qué uso ahí' },
+  sceneHint: { en: 'Select a layer to inspect stack', es: 'Selecciona una capa para ver su stack' },
 
   workTitle: { en: 'Selected work', es: 'Proyectos destacados' },
   moreTitle: { en: 'More projects', es: 'Más proyectos' },
@@ -53,26 +54,26 @@ export const ui = {
   readCase: { en: 'Read the case study', es: 'Leer el caso' },
   repo: { en: 'Repository', es: 'Repositorio' },
   privateRepo: { en: 'Private repository', es: 'Repositorio privado' },
-  live: { en: 'Live API', es: 'API en línea' },
+  live: { en: 'Live app', es: 'App en línea' },
 
   skillsTitle: { en: 'What I work with', es: 'Con qué trabajo' },
   seenIn: { en: 'Used in', es: 'Usado en' },
 
   aboutTitle: { en: 'About me', es: 'Sobre mí' },
   aboutText: {
-    en: 'I see software end to end: how a data flow, an AI model or an infrastructure choice reaches the backend and the product. That lets me join any stage of a project, work with specialists and turn complex requirements into technical plans.',
-    es: 'Veo el software de punta a punta: cómo un flujo de datos, un modelo de IA o una decisión de infraestructura llega al backend y al producto. Eso me permite sumarme a cualquier etapa de un proyecto, trabajar con especialistas y convertir requisitos complejos en planes técnicos.',
+    en: 'I work mostly on the backend: service boundaries, data models and how services talk to each other. My strongest side is architecture and system design: choosing a modular monolith or services, synchronous calls or events, and writing down what each choice costs. Next I want to go deeper into data and AI engineering: pipelines, storage at scale and serving models, where backend work meets what the market is asking for.',
+    es: 'Trabajo sobre todo en el backend: los límites entre servicios, los modelos de datos y cómo se comunican los servicios. Mi lado más fuerte es la arquitectura y el diseño de sistemas: elegir entre un monolito modular o servicios, llamadas síncronas o eventos, y dejar escrito lo que cuesta cada opción. Ahora quiero profundizar en ingeniería de datos e IA: pipelines, almacenamiento a escala y servir modelos, donde el trabajo de backend se cruza con lo que pide el mercado.',
   },
   gpa: { en: 'GPA out of 5.0', es: 'promedio sobre 5,0' },
   deans: { en: "semesters on the Dean's List", es: 'semestres en el Cuadro de Honor' },
   english: { en: 'English level', es: 'nivel de inglés' },
   projectsCount: { en: 'projects in this portfolio', es: 'proyectos en este portafolio' },
-  certsTitle: { en: 'Certifications', es: 'Certificaciones' },
+  certsTitle: { en: 'Courses and credentials', es: 'Cursos y credenciales' },
 
   contactTitle: { en: "Let's talk.", es: '¿Hablamos?' },
   contactCta: { en: 'Send a request.', es: 'Envía una petición.' },
-  bootProjects: { en: 'Loaded {n} projects with case studies', es: 'Cargados {n} proyectos con casos de estudio' },
-  bootIntern: { en: 'Internship availability: 2027-1', es: 'Disponibilidad para práctica: 2027-1' },
+  bootProjects: { en: '{n} case studies loaded', es: '{n} casos de estudio cargados' },
+  bootIntern: { en: 'Internship: 6+ months, remote or on-site', es: 'Práctica: 6+ meses, remota o presencial' },
   bootBuild: { en: 'Building a data-intensive side project', es: 'Construyendo un proyecto propio intensivo en datos' },
   contactText: { en: 'Internship from 2027-1: 6 months or more, remote, hybrid or on site. Open to staying longer.', es: 'Práctica desde 2027-1: 6 meses o más, remota, híbrida o presencial. Abierto a quedarme por más tiempo.' },
   certsVerify: { en: 'Verify credential', es: 'Verificar credencial' },
@@ -89,6 +90,11 @@ export const ui = {
   csCost: { en: 'Cost', es: 'Costo' },
   csStack: { en: 'Stack', es: 'Stack' },
   csResults: { en: 'Results', es: 'Resultados' },
+  csTransitions: { en: 'State transitions', es: 'Transiciones de estado' },
+  ttFrom: { en: 'From', es: 'Desde' },
+  ttEvent: { en: 'Event', es: 'Evento' },
+  ttTo: { en: 'To', es: 'Hacia' },
+  ttNoop: { en: 'no-op', es: 'sin cambio' },
   csNext: { en: "What I'd do next", es: 'Qué haría después' },
   csRole: { en: 'My role', es: 'Mi rol' },
   csTeam: { en: 'Team', es: 'Equipo' },
@@ -109,6 +115,11 @@ export const ui = {
 } satisfies Record<string, T>;
 
 export const t = (key: keyof typeof ui, lang: Lang) => ui[key][lang];
+
+/** Escapes HTML and turns `code` spans into <code> elements. */
+export function fmt(text: string) {
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/`([^`]+)`/g, '<code>$1</code>');
+}
 export const tx = (text: T, lang: Lang) => text[lang];
 
 /** Numbers follow each language: 2,588 and 0.837 in English, 2.588 and 0,837 in Spanish. */

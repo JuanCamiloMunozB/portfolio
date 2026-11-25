@@ -1,102 +1,215 @@
 ---
+/**
+ * Hero system map, built around data and architecture. An event bus runs through the middle;
+ * the API, the services and the AI block publish to it. Below, the data layer: a database,
+ * an ETL pipeline and a layered data lake that trains the AI. On top, a CI/CD conveyor carries
+ * container images and deploys them into the cluster. An insights dashboard reads it all.
+ * Each layer shows its stack on hover, focus or tap.
+ */
 import { t, type Lang } from '../i18n/ui';
+import { skills } from '../data/skills';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const es = lang === 'es';
 const L = {
-  ui: es ? 'interfaz' : 'ui', api: 'api', events: es ? 'eventos' : 'events', data: es ? 'datos' : 'data',
-  insights: es ? 'ia' : 'ai', cloud: es ? 'nube' : 'cloud',
+  ui: es ? 'interfaz' : 'ui', api: 'api', svc: es ? 'servicios' : 'services', ai: es ? 'ia' : 'ai', events: es ? 'eventos' : 'events',
+  data: es ? 'datos' : 'data', etl: 'etl', lake: es ? 'lago' : 'lake', ops: 'insights', cicd: 'ci/cd', cloud: es ? 'nube' : 'cloud',
 };
-// Tools per layer: only what the profile lists.
 const STACK: Record<string, [string, string]> = {
   ui: [es ? 'Interfaz' : 'UI', 'React, Next.js, TypeScript, Tailwind CSS'],
-  api: ['API', 'Java, Spring Boot, NestJS, Node.js, FastAPI, Flask, Django, GraphQL, JWT'],
-  events: [es ? 'Eventos' : 'Events', 'Kafka, RabbitMQ, WebSockets, CQRS, circuit breaker'],
-  data: [es ? 'Datos' : 'Data', 'PostgreSQL, MongoDB, Redis, Neo4j, BigQuery, Supabase'],
-  insights: [es ? 'IA y análisis' : 'AI and insights', 'scikit-learn, XGBoost, Optuna, SHAP, pandas, OpenCV, MediaPipe, Airflow, drift monitoring'],
-  cloud: [es ? 'Nube' : 'Cloud', 'Docker, Kubernetes, Terraform, Jenkins, GitHub Actions, AWS, Google Cloud, Azure'],
+  api: ['API', 'Java, Spring Boot, TypeScript, NestJS, Node.js, Express, Python, FastAPI, Flask, Django, GraphQL, JWT'],
+  svc: [es ? 'Servicios' : 'Services', es ? 'AWS Lambda (workers), AWS Cognito (identidad), AWS IAM (acceso)' : 'AWS Lambda (workers), AWS Cognito (identity), AWS IAM (access)'],
+  ai: [es ? 'IA' : 'AI', 'scikit-learn, NumPy, Optuna, OpenCV, MediaPipe'],
+  events: [es ? 'Bus de eventos' : 'Event bus', 'Kafka, RabbitMQ, Amazon SQS, Amazon SNS, Amazon EventBridge'],
+  data: [es ? 'Datos operacionales' : 'Operational data', 'PostgreSQL, MongoDB, Redis, Neo4j, Supabase, Amazon RDS, Amazon DynamoDB'],
+  etl: ['ETL', 'Airflow, Dataflow, AWS Glue, Amazon Kinesis, pandas'],
+  lake: [es ? 'Lago de datos' : 'Data lake', 'Amazon S3, AWS Lake Formation, AWS Glue, Amazon Athena'],
+  wh: [es ? 'Almacén de datos' : 'Data warehouse', 'BigQuery, Amazon Redshift'],
+  ops: ['Insights', 'Grafana, Prometheus, Jaeger, Amazon CloudTrail'],
+  cicd: ['CI/CD', 'GitHub Actions, Jenkins, Docker, Terraform, SonarQube, Trivy'],
+  cloud: [es ? 'Nube' : 'Cloud', 'AWS, Azure, Google Cloud, Kubernetes, Vercel, Render, Linux'],
 };
-const node = (k: string) => ({ tabindex: 0, role: 'button', 'data-layer': k, 'aria-label': `${STACK[k][0]}: ${STACK[k][1]}` });
+// Every tool named here must also be in the skills section
+const known = new Set(skills.flatMap((s) => s.tools));
+for (const [, list] of Object.values(STACK)) for (const tool of list.split(', ').map((x) => x.replace(/ \(.*\)$/, ''))) if (!known.has(tool)) throw new Error(`Hero stack names "${tool}", which is not in src/data/skills.ts`);
+const DEFAULT = 'api';
+const node = (k: string) => ({ tabindex: 0, role: 'button', 'data-layer': k, 'aria-label': `${STACK[k][0]}: ${STACK[k][1]}`, class: `node${k === 'cloud' ? ' cloud' : ''}${k === DEFAULT ? ' on' : ''}` });
+const bars = [
+  { x: 190, c: 'a', h: '6;16;9;20;6' }, { x: 196, c: 'm', h: '12;6;18;10;12' },
+  { x: 202, c: 'a', h: '17;10;5;14;17' }, { x: 208, c: 'm', h: '8;20;12;6;8' }, { x: 214, c: 'a', h: '14;8;20;11;14' },
+];
 ---
 <figure class="scene" data-stack={JSON.stringify(STACK)}>
-  <svg class="px" id="sys" viewBox="0 0 200 92" role="group" aria-label={t('sceneLabel', lang)}>
+  <svg class="px" id="sys" viewBox="0 0 240 150" role="group" aria-label={t('sceneLabel', lang)}>
     <defs><pattern id="dots" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="1" height="1" class="l" /></pattern></defs>
-    <rect width="200" height="92" fill="url(#dots)" />
+    <rect width="240" height="150" fill="url(#dots)" />
 
-    <g class="node cloud" {...node('cloud')}>
-      <rect class="cloudline" x="49.5" y="16.5" width="113" height="70" />
-      <text class="lbl" x="66" y="13">{L.cloud}</text>
+    <g {...node('cloud')}>
+      <rect class="cloudline" x="50.5" y="24.5" width="186" height="122" />
+      <text class="lbl" x="224" y="26.5">{L.cloud}</text>
     </g>
 
-    <g class="sb">
-      {[40, 44, 48, 52, 82, 86, 124, 128, 156, 160, 164].map((x) => <rect x={x} y="45" width="2" height="1" />)}
-    </g>
-
-    <g class="node" {...node('ui')}>
-      <rect class="frame ls" x="4" y="28" width="36" height="32" />
-      <rect class="s" x="5" y="29" width="34" height="30" />
-      <rect class="s2" x="5" y="29" width="34" height="5" />
-      <rect class="m" x="7" y="31" width="2" height="2" /><rect class="m" x="10" y="31" width="2" height="2" /><rect class="m" x="13" y="31" width="2" height="2" />
-      <rect class="m" x="8" y="37" width="20" height="2" /><rect class="sb" x="8" y="41" width="14" height="2" /><rect class="sb" x="8" y="45" width="17" height="2" />
-      <rect class="click" x="8" y="50" width="12" height="5" />
-      <g class="cursor-bob"><rect class="i" x="22" y="52" width="1" height="5" /><rect class="i" x="23" y="53" width="1" height="3" /><rect class="i" x="24" y="54" width="1" height="1" /></g>
-      <g class="ok-bubble"><rect class="a" x="22" y="20" width="16" height="7" /><rect class="a" x="24" y="27" width="2" height="2" /><text x="30" y="25.5" style="font:400 5px Silkscreen,monospace;fill:var(--bg);text-anchor:middle">200</text></g>
-      <text class="lbl" x="22" y="68">{L.ui}</text>
-    </g>
-
-    <g class="node" {...node('api')}>
-      <rect class="frame ls" x="58" y="25" width="24" height="40" />
-      <rect class="s2" x="59" y="26" width="22" height="38" />
-      {[0, 1, 2, 3].map((i) => (
+    <!-- CI/CD: a conveyor that carries images and drops them into the cluster -->
+    <g {...node('cicd')}>
+      <rect class="frame ls" x="30" y="10" width="206" height="8" />
+      <rect class="s2" x="31" y="11" width="204" height="6" />
+      <line class="wire flow" x1="32" y1="14" x2="234" y2="14" />
+      {[0, 1, 2].map((i) => (
         <g>
-          <rect class="b" x="61" y={28 + i * 9} width="18" height="7" />
-          <rect class="led" style={`animation-delay:-${(i * 0.37) % 1.33}s`} x="63" y={30 + i * 9} width="2" height="2" />
-          <rect class="led" style={`animation-delay:-${(i * 0.53 + 0.4) % 1.33}s`} x="66" y={30 + i * 9} width="2" height="2" />
-          <rect class="ls" x="70" y={30 + i * 9} width="7" height="1" /><rect class="ls" x="70" y={32 + i * 9} width="7" height="1" />
+          <rect class="a" x="-4" y="-3" width="8" height="6"><animateMotion dur="6s" begin={`-${i * 2}s`} repeatCount="indefinite" path="M34 6 H232" /></rect>
+          <rect class="ai" x="-2" y="-1" width="4" height="1"><animateMotion dur="6s" begin={`-${i * 2}s`} repeatCount="indefinite" path="M34 6 H232" /></rect>
         </g>
       ))}
-      <text class="lbl" x="70" y="73">{L.api}</text>
+      {[71, 116, 190].map((x) => <line class="dash-a flow" x1={x} y1="18" x2={x} y2="29" />)}
+      <text class="lbl" x="15" y="16">{L.cicd}</text>
     </g>
 
-    <g class="node" {...node('events')}>
-      <rect class="frame ls" x="90" y="38" width="34" height="1" /><rect class="frame ls" x="90" y="52" width="34" height="1" />
-      <rect class="s2" x="90" y="39" width="34" height="13" />
-      <rect class="ls" x="89" y="37" width="2" height="17" /><rect class="ls" x="123" y="37" width="2" height="17" />
-      <rect class="m" y="42" width="5" height="7"><animate attributeName="x" from="91" to="118" dur="1.33s" repeatCount="indefinite" /></rect>
-      <rect class="a" y="42" width="5" height="7"><animate attributeName="x" from="91" to="118" dur="1.33s" begin="-.44s" repeatCount="indefinite" /></rect>
-      <rect class="m" y="42" width="5" height="7"><animate attributeName="x" from="91" to="118" dur="1.33s" begin="-.88s" repeatCount="indefinite" /></rect>
-      <text class="lbl" x="107" y="73">{L.events}</text>
+    <!-- UI: a browser with a component tree, sending requests to the API -->
+    <g {...node('ui')}>
+      <g opacity="0"><rect class="a" x="13" y="21" width="20" height="7" /><text x="23" y="26.5" style="font:400 5px Silkscreen,monospace;fill:var(--bg);text-anchor:middle">200</text><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;.55;.6;.85;.9" dur="4s" repeatCount="indefinite" /></g>
+      <rect class="frame ls" x="4" y="28" width="40" height="32" />
+      <rect class="s" x="5" y="29" width="38" height="30" />
+      <rect class="s2" x="5" y="29" width="38" height="5" />
+      <rect class="m" x="7" y="31" width="2" height="2" /><rect class="m" x="10" y="31" width="2" height="2" /><rect class="m" x="13" y="31" width="2" height="2" />
+      <rect class="typeline m" x="8" y="37" width="28" height="2" /><rect class="typeline sb" style="animation-delay:.3s" x="8" y="41" width="22" height="2" /><rect class="typeline sb" style="animation-delay:.6s" x="8" y="45" width="24" height="2" />
+      <rect class="click" x="8" y="50" width="12" height="5" />
+      <g class="cursor-bob"><rect class="i" x="21" y="52" width="1" height="5" /><rect class="i" x="22" y="53" width="1" height="3" /><rect class="i" x="23" y="54" width="1" height="1" /></g>
+      <line class="wire flow" x1="44" y1="44" x2="60" y2="44" />
+      <rect class="a" x="-1.5" y="-1.5" width="3" height="3"><animateMotion dur="1.5s" repeatCount="indefinite" path="M44 44 H60" /></rect>
+      <text class="lbl" x="24" y="67">{L.ui}</text>
     </g>
 
-    <g class="node" {...node('data')}>
-      <rect class="s2" x="132" y="30" width="24" height="32" />
-      <rect class="a" x="133" y="48" width="22" height="14"><animate attributeName="y" values="60;36;36;60" keyTimes="0;.85;.95;1" dur="4s" repeatCount="indefinite" /><animate attributeName="height" values="2;26;26;2" keyTimes="0;.85;.95;1" dur="4s" repeatCount="indefinite" /></rect>
-      <rect class="frame ls" x="134" y="27" width="20" height="1" /><rect class="frame ls" x="132" y="28" width="2" height="2" /><rect class="frame ls" x="154" y="28" width="2" height="2" />
-      <rect class="s" x="134" y="28" width="20" height="2" /><rect class="frame ls" x="134" y="30" width="20" height="1" />
-      <rect class="frame ls" x="132" y="30" width="1" height="33" /><rect class="frame ls" x="155" y="30" width="1" height="33" />
-      <rect class="ls" x="133" y="41" width="22" height="1" /><rect class="ls" x="133" y="51" width="22" height="1" />
-      <rect class="frame ls" x="134" y="63" width="20" height="1" />
-      <text class="lbl" x="144" y="73">{L.data}</text>
+    <!-- Services: containers -->
+    <g {...node('api')}>
+      <rect class="frame ls" x="60" y="28" width="22" height="32" />
+      <rect class="s" x="61" y="29" width="20" height="30" />
+      {[0, 1, 2, 3].map((i) => (
+        <g>
+          <rect class="s2" x="63" y={31 + i * 7} width="16" height="5" />
+          <rect class="led" style={`animation-delay:-${(i * 0.41) % 1.33}s`} x="64" y={32 + i * 7} width="3" height="3" />
+          <rect class="ls" x="69" y={32 + i * 7} width="8" height="1" /><rect class="ls" x="69" y={34 + i * 7} width="6" height="1" />
+        </g>
+      ))}
+      <line class="dash-a flow" x1="71" y1="60" x2="71" y2="68" />
+      <text class="lbl" x="71" y="66">{L.api}</text>
     </g>
 
-    <g class="node" {...node('insights')}>
-      <rect class="frame m" x="168" y="27" width="1" height="36" /><rect class="frame m" x="168" y="62" width="28" height="1" />
-      {[
-        { x: 172, c: 'a', h: '6;20;10;26;6' }, { x: 178, c: 'm', h: '14;8;24;12;14' },
-        { x: 184, c: 'a', h: '22;12;6;18;22' }, { x: 190, c: 'm', h: '10;26;16;8;10' },
-      ].map((b) => (
-        <rect class={b.c} x={b.x} y={62 - +b.h.split(';')[0]} width="4" height={b.h.split(';')[0]}>
+    <g {...node('svc')}>
+      {[96, 120].map((x, k) => (
+        <g>
+          <rect class="frame ls" x={x} y="32" width="18" height="24" />
+          <rect class="s2" x={x + 1} y="33" width="16" height="22" />
+          {[0, 1, 2].map((i) => <rect class={i === 1 ? 'm' : 'ls'} x={x + 3} y={36 + i * 6} width="12" height="4" />)}
+          <rect class="led" style={`animation-delay:-${k * 0.6}s`} x={x + 13} y="37" width="2" height="2" />
+          <rect class="a" x={x + 6} y="30" width="6" height="2" /><rect class="ls" x={x + 4} y="52" width="10" height="1" />
+          <line class="dash-a flow" x1={x + 9} y1="56" x2={x + 9} y2="68" />
+        </g>
+      ))}
+      <text class="lbl" x="116" y="64">{L.svc}</text>
+    </g>
+
+    <!-- AI: retrieval index and a model -->
+    <g {...node('ai')}>
+      <rect class="frame ls" x="158" y="30" width="64" height="28" />
+      <rect class="s" x="159" y="31" width="62" height="26" />
+      {[0, 1, 2].map((r) => [0, 1, 2].map((c) => <rect class={(r + c) % 3 === 0 ? 'a' : 'ls'} x={162 + c * 4} y={34 + r * 4} width="2" height="2" />))}
+      <rect class="typeline sb" x="162" y="48" width="10" height="1" /><rect class="typeline sb" style="animation-delay:.4s" x="162" y="51" width="7" height="1" />
+      <g class="wire"><line x1="181" y1="38" x2="195" y2="35" /><line x1="181" y1="38" x2="195" y2="44" /><line x1="181" y1="38" x2="195" y2="53" /><line x1="181" y1="50" x2="195" y2="35" /><line x1="181" y1="50" x2="195" y2="44" /><line x1="181" y1="50" x2="195" y2="53" /><line x1="195" y1="35" x2="209" y2="44" /><line x1="195" y1="44" x2="209" y2="44" /><line x1="195" y1="53" x2="209" y2="44" /></g>
+      <rect class="ls" x="178" y="35" width="6" height="6" /><rect class="ls" x="178" y="47" width="6" height="6" />
+      <rect class="boot" x="192" y="32" width="6" height="6" /><rect class="boot" style="animation-delay:.4s" x="192" y="41" width="6" height="6" /><rect class="boot" style="animation-delay:.8s" x="192" y="50" width="6" height="6" />
+      <rect class="a" x="206" y="41" width="6" height="6" /><rect class="ai" x="208" y="43" width="2" height="2" />
+      <rect class="a" x="-1" y="-1" width="2" height="2"><animateMotion dur="1.6s" repeatCount="indefinite" path="M181 38 L195 44 L209 44" /></rect>
+      <rect class="i" x="-1" y="-1" width="2" height="2"><animateMotion dur="1.6s" begin="-.8s" repeatCount="indefinite" path="M181 50 L195 35 L209 44" /></rect>
+      <rect class="ls" x="214" y="34" width="6" height="4" /><rect class="m" x="215" y="35" width="4" height="1" />
+      <rect class="ls" x="214" y="40" width="6" height="4" /><rect class="m" x="215" y="41" width="3" height="1" />
+      <rect class="ls" x="214" y="46" width="6" height="4" /><rect class="m" x="215" y="47" width="4" height="1" />
+      <line class="dash-a flow" x1="212" y1="58" x2="212" y2="68" />
+      <text class="lbl" x="190" y="64">{L.ai}</text>
+    </g>
+
+    <!-- Event bus: two lanes of messages -->
+    <g {...node('events')}>
+      <rect class="frame ls" x="54" y="68" width="178" height="1" /><rect class="frame ls" x="54" y="80" width="178" height="1" />
+      <rect class="s2" x="54" y="69" width="178" height="11" />
+      <rect class="ls" x="54" y="74" width="178" height="1" />
+      {[0, 1, 2].map((i) => <rect class={i === 1 ? 'a' : 'm'} y="70" width="5" height="3"><animate attributeName="x" from="56" to="226" dur="3s" begin={`-${i}s`} repeatCount="indefinite" /></rect>)}
+      {[0, 1].map((i) => <rect class={i === 0 ? 'a' : 'sb'} y="76" width="5" height="3"><animate attributeName="x" from="226" to="56" dur="3.6s" begin={`-${i * 1.8}s`} repeatCount="indefinite" /></rect>)}
+      <text class="lbl" x="214" y="88">{L.events}</text>
+    </g>
+
+    <!-- operational plane -->
+    <rect class="dash-s" x="55.5" y="86.5" width="33" height="52" fill="none" stroke="var(--line-strong)" stroke-dasharray="2 2" />
+    <text class="lbl" x="72" y="144" style="font-size:4px">{es ? 'operacional' : 'operational'}</text>
+    <g {...node('data')}>
+      <line class="wire flow" x1="66" y1="81" x2="66" y2="94" />
+      <rect class="s2" x="60" y="98" width="24" height="26" />
+      <rect class="a" x="61" y="110" width="22" height="13"><animate attributeName="y" values="122;104;104;122" keyTimes="0;.85;.95;1" dur="4s" repeatCount="indefinite" /><animate attributeName="height" values="2;19;19;2" keyTimes="0;.85;.95;1" dur="4s" repeatCount="indefinite" /></rect>
+      <rect class="frame ls" x="62" y="95" width="20" height="1" /><rect class="frame ls" x="60" y="96" width="2" height="2" /><rect class="frame ls" x="82" y="96" width="2" height="2" />
+      <rect class="s" x="62" y="96" width="20" height="2" /><rect class="frame ls" x="62" y="98" width="20" height="1" />
+      <rect class="frame ls" x="60" y="98" width="1" height="27" /><rect class="frame ls" x="83" y="98" width="1" height="27" />
+      <rect class="frame ls" x="62" y="125" width="20" height="1" />
+      <rect class="ls" x="61" y="106" width="22" height="1" /><rect class="ls" x="61" y="115" width="22" height="1" />
+      <text class="lbl" x="72" y="133">{L.data}</text>
+    </g>
+
+    <g {...node('etl')}>
+      <line class="wire flow" x1="84" y1="109" x2="120" y2="109" />
+      {['e', 't', 'l'].map((c, i) => (
+        <g>
+          <rect class="frame ls" x={92 + i * 9} y="105" width="8" height="8" />
+          <rect class="stage" style={`animation-delay:${i * 0.5}s`} x={93 + i * 9} y="106" width="6" height="6" />
+          <text x={96 + i * 9} y="111" style="font:400 4px Silkscreen,monospace;fill:var(--bg);text-anchor:middle">{c}</text>
+        </g>
+      ))}
+      <rect class="a" x="-1.5" y="-1.5" width="3" height="3"><animateMotion dur="2s" repeatCount="indefinite" path="M84 109 H122" /></rect>
+      <text class="lbl" x="105" y="122">{L.etl}</text>
+    </g>
+
+    <!-- analytical plane: lake then warehouse -->
+    <rect x="120.5" y="86.5" width="60" height="52" fill="none" stroke="var(--line-strong)" stroke-dasharray="2 2" />
+    <text class="lbl" x="150" y="144" style="font-size:4px">{es ? 'analítico' : 'analytical'}</text>
+    <g {...node('lake')}>
+      <rect class="frame ls" x="123" y="94" width="24" height="30" />
+      <rect class="s2" x="124" y="95" width="22" height="28" />
+      {[0, 1, 2].map((i) => <g><rect class="ls" x={126 + i * 6} y="97" width="4" height="5" /><rect class="m" x={127 + i * 6} y="98" width="2" height="1" /></g>)}
+      <rect class="sb" x="124" y="105" width="22" height="5" />
+      <rect class="m" x="124" y="111" width="22" height="5" />
+      <rect class="a" x="124" y="117" width="22" height="6" />
+      {[0, 1, 2].map((i) => <rect class="ai" x={126 + i * 7} y={i % 2 ? 119 : 120} width="3" height="1" />)}
+      <text class="lbl" x="135" y="133">{L.lake}</text>
+    </g>
+    <g {...node('wh')}>
+      <line class="wire flow" x1="147" y1="109" x2="153" y2="109" />
+      <rect class="frame ls" x="153" y="94" width="25" height="30" />
+      <rect class="s" x="154" y="95" width="23" height="28" />
+      <rect class="a" x="161" y="104" width="9" height="9" /><rect class="ai" x="163" y="106" width="5" height="1" /><rect class="ai" x="163" y="109" width="5" height="1" />
+      {[[155, 97], [171, 97], [155, 116], [171, 116]].map(([x, y]) => <rect class="m" x={x} y={y} width="5" height="5" />)}
+      <g class="wire"><line x1="160" y1="102" x2="162" y2="104" /><line x1="171" y1="102" x2="169" y2="104" /><line x1="160" y1="116" x2="162" y2="113" /><line x1="171" y1="116" x2="169" y2="113" /></g>
+      <line class="dash-a flow" x1="178" y1="98" x2="198" y2="98" /><line class="dash-a flow" x1="198" y1="98" x2="198" y2="58" />
+      <rect class="i" x="-1.5" y="-1.5" width="3" height="3"><animateMotion dur="2.5s" repeatCount="indefinite" path="M178 98 H198 V58" /></rect>
+      <text class="lbl" x="165.5" y="133" style="font-size:4px">{es ? 'almacén' : 'warehouse'}</text>
+    </g>
+
+    <!-- Ops: a monitor watching the system -->
+    <g {...node('ops')}>
+      <rect class="frame ls" x="184" y="104" width="46" height="32" />
+      <rect class="b" x="185" y="105" width="44" height="30" />
+      {bars.map((b) => (
+        <rect class={b.c} x={b.x} y={132 - +b.h.split(';')[0]} width="4" height={b.h.split(';')[0]}>
           <animate attributeName="height" values={b.h} dur="1.33s" repeatCount="indefinite" />
-          <animate attributeName="y" values={b.h.split(';').map((v) => 62 - +v).join(';')} dur="1.33s" repeatCount="indefinite" />
+          <animate attributeName="y" values={b.h.split(';').map((v) => 132 - +v).join(';')} dur="1.33s" repeatCount="indefinite" />
         </rect>
       ))}
-      <text class="lbl" x="182" y="73">{L.insights}</text>
+      <rect class="s2" x="185" y="105" width="44" height="4" /><rect class="a" x="187" y="106" width="2" height="2" /><rect class="ls" x="191" y="106" width="12" height="1" />
+      <polyline class="wire" fill="none" points="188,121 194,116 200,119 206,112 212,114 218,110 225,113" />
+      <rect class="i" x="-1" y="-1" width="2" height="2"><animateMotion dur="3s" repeatCount="indefinite" path="M188 121 L194 116 L200 119 L206 112 L212 114 L218 110 L225 113" /></rect>
+      <text class="lbl" x="207" y="143">{L.ops}</text>
     </g>
-
-    <rect class="a" x="-2" y="-2" width="4" height="4"><animateMotion dur="4s" repeatCount="indefinite" path="M20 52 L20 45 L170 45" keyPoints="0;1;1" keyTimes="0;.85;1" calcMode="linear" /><animate attributeName="opacity" values="1;1;0;0" keyTimes="0;.84;.85;1" dur="4s" repeatCount="indefinite" /></rect>
-    <rect class="i" x="-1" y="-1" width="2" height="2"><animateMotion dur="4s" begin="-2s" repeatCount="indefinite" path="M20 52 L20 45 L170 45" keyPoints="0;1;1" keyTimes="0;.85;1" calcMode="linear" /><animate attributeName="opacity" values="1;1;0;0" keyTimes="0;.84;.85;1" dur="4s" begin="-2s" repeatCount="indefinite" /></rect>
   </svg>
-  <figcaption class="scene-cap" aria-live="polite"><span id="cap-k">{t('sceneHint', lang)}</span><b id="cap-v">{t('sceneHint2', lang)}</b></figcaption>
+  <figcaption class="scene-cap" aria-live="polite">
+    <span class="hint">{t('sceneHint', lang)}</span>
+    <span id="cap-k">{STACK[DEFAULT][0]}</span><b id="cap-v">{STACK[DEFAULT][1]}</b>
+  </figcaption>
 </figure>
 
 <script>

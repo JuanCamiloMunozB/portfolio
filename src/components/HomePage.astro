@@ -8,7 +8,7 @@ import Icon from './Icon.astro';
 import Neofetch from './Neofetch.astro';
 import { t, tx, num, type Lang } from '../i18n/ui';
 import { SITE, localized, url } from '../data/site';
-import { projects, featured, more, bonus, type Project } from '../data/projects';
+import { projects, featured, more, bonus, withCase, type Project } from '../data/projects';
 import { certs } from '../data/certs';
 import { skills } from '../data/skills';
 
@@ -20,8 +20,9 @@ const metricText = (p: Project) => p.metric ? num(p.metric.value, lang, p.metric
 const caseHref = (p: Project) => localized(lang, `work/${p.slug}/`);
 const evidenceHref = (slug: string) => {
   const p = projects.find((x) => x.slug === slug)!;
-  return { href: p.tier === 'featured' ? caseHref(p) : p.repo ?? SITE.github, title: tx(p.title, lang) };
+  return { href: p.case ? caseHref(p) : p.repo ?? SITE.github, title: tx(p.title, lang) };
 };
+const STACK = ['Java (Spring Boot)', 'TypeScript (NestJS)', 'PostgreSQL', 'Kafka', 'Docker', lang === 'es' ? 'Nube' : 'Cloud'];
 const mail = `mailto:${SITE.email}?subject=${encodeURIComponent(t('emailSubject', lang))}`;
 ---
 <Base lang={lang}>
@@ -30,19 +31,17 @@ const mail = `mailto:${SITE.email}?subject=${encodeURIComponent(t('emailSubject'
       <div>
         <Prompt cmd="whoami" />
         <h1>Juan Camilo<br />Muñoz Barco</h1>
-        <p class="tagline" set:html={t('tagline', lang)} />
+        <p class="role-line">{t('roleLine', lang)}</p>
+        <p class="build-line">{t('buildLine', lang)}</p>
         <div class="avail"><span class="dot" aria-hidden="true"></span><span>{t('available', lang)}</span></div>
-        <div class="ctas hero-cv">
-          <a class="btn btn-primary" href={SITE.cv[lang]} data-cv={lang}><Icon name="download" /><span class="lbl-text">{t('downloadCv', lang)}</span></a>
+        <div class="ctas hero-cta">
+          <a class="btn btn-primary" href={mail}><Icon name="mail" />{t('emailMe', lang)}</a>
           <a class="btn btn-ghost" href={localized(lang, 'cv/')}><Icon name="eye" />{t('viewCv', lang)}</a>
-        </div>
-        <div class="ctas hero-contact">
-          <a class="btn btn-ghost" href={mail}><Icon name="mail" />{t('emailMe', lang)}</a>
           <a class="btn btn-ghost btn-icon" href={SITE.linkedin} aria-label="LinkedIn" title="LinkedIn"><Icon name="linkedin" /></a>
           <a class="btn btn-ghost btn-icon" href={SITE.github} aria-label="GitHub" title="GitHub"><Icon name="github" /></a>
         </div>
-        <ol class="bootlog" aria-label="Status">
-          <li><span class="ok">[  OK  ]</span> {t('bootProjects', lang).replace('{n}', String(featured.length + more.length))}</li>
+        <ol class="bootlog" aria-label={lang === 'es' ? 'Estado' : 'Status'}>
+          <li><span class="ok">[  OK  ]</span> {t('bootProjects', lang).replace('{n}', String(withCase.length))}</li>
           <li><span class="ok">[  OK  ]</span> {t('bootIntern', lang)}</li>
           <li><span class="run">[ BUSY ]</span> {t('bootBuild', lang)}</li>
         </ol>
@@ -73,11 +72,11 @@ const mail = `mailto:${SITE.email}?subject=${encodeURIComponent(t('emailSubject'
           <a class="card reveal" href={caseHref(p)}>
             <div class="art"><Scene name={p.scene} label={tx(p.sceneLabel, lang)} /></div>
             <div class="body">
-              <h3>{tx(p.title, lang)} <small>{p.inProgress ? <span class="status">{t('inProgress', lang)}</span> : p.year}</small></h3>
+              <h3>{tx(p.title, lang)} <small>{p.year}</small></h3>
               <p class="cap">{tx(p.caption, lang)}</p>
               {p.metric && <div class="metric"><b data-count={p.metric.value} data-dec={p.metric.decimals ?? 0} data-suffix={suffix(p.metric.suffix)}>{metricText(p)}</b><span>{tx(p.metric.label, lang)}</span></div>}
               <div class="tags">{p.tags.slice(0, 4).map((tag) => <span class="tag">{tag}</span>)}</div>
-              <span class="go">{t('readCase', lang)} /&gt;</span>
+              <span class="go">{t('readCase', lang)}</span>
             </div>
           </a>
         ))}
@@ -86,14 +85,14 @@ const mail = `mailto:${SITE.email}?subject=${encodeURIComponent(t('emailSubject'
       <h3 class="sub">{t('moreTitle', lang)}</h3>
       <div class="cards more">
         {more.map((p) => (
-          <a class="card reveal" href={p.repo}>
+          <a class="card reveal" href={p.case ? caseHref(p) : p.repo}>
             <div class="art"><Scene name={p.scene} label={tx(p.sceneLabel, lang)} /></div>
             <div class="body">
               <h3>{tx(p.title, lang)} <small>{p.year}</small></h3>
               <p class="cap">{tx(p.caption, lang)}</p>
               {p.metric && <div class="metric"><b data-count={p.metric.value} data-dec={p.metric.decimals ?? 0}>{metricText(p)}</b><span>{tx(p.metric.label, lang)}</span></div>}
               <div class="tags">{p.tags.map((tag) => <span class="tag">{tag}</span>)}</div>
-              <span class="go">{t('repo', lang)} /&gt;</span>
+              <span class="go">{p.case ? t('readCase', lang) : t('repo', lang)}</span>
             </div>
           </a>
         ))}
@@ -132,12 +131,12 @@ const mail = `mailto:${SITE.email}?subject=${encodeURIComponent(t('emailSubject'
   <div class="ascii-rule" aria-hidden="true"><span>[ 04 ]</span></div>
   <section class="block" id="certs" aria-labelledby="certs-title" data-focus data-prompt="~/certs">
     <div class="wrap">
-      <Prompt cmd="ls ./certs" />
+      <Prompt cmd="ls ./credentials" />
       <h2 class="type" id="certs-title"><span class="t">{t('certsTitle', lang)}</span></h2>
       <div class="certs">
         {certs.map((c) => (
           <a class="cert reveal" href={c.url} rel="noopener">
-            <div class="art"><Scene name={c.scene} label={tx(c.sceneLabel, lang)} /></div>
+            <div class="art"><Scene name={c.scene} label={tx(c.sceneLabel, lang)} lang={lang} /></div>
             <div class="body"><b>{tx(c.name, lang)}</b><span>{c.issuer}</span><small>{tx(c.date, lang)}</small><span class="verify"><Icon name="eye" size={14} />{t('certsVerify', lang)}</span></div>
           </a>
         ))}
@@ -153,7 +152,7 @@ const mail = `mailto:${SITE.email}?subject=${encodeURIComponent(t('emailSubject'
       <p>{t('contactText', lang)}</p>
       <div class="contact-grid">
         <div class="ctile main">
-          <a class="ctile-link" href={mail}><Icon name="mail" size={32} /><span class="k">Email</span><b>{SITE.email}</b></a>
+          <a class="ctile-link" href={mail}><Icon name="mail" size={32} /><span class="k">{lang === 'es' ? 'Correo' : 'Email'}</span><b>{SITE.email}</b></a>
           <button class="copy" type="button" data-copy={SITE.email} data-done={t('copied', lang)}><Icon name="copy" size={16} /><span>{t('copyEmail', lang)}</span></button>
         </div>
         <a class="ctile" href={SITE.linkedin}><Icon name="linkedin" size={32} /><span class="k">LinkedIn</span><b>in/juancamuba</b></a>

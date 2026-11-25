@@ -12,7 +12,7 @@ const { lang } = Astro.props;
  \___/ \____||_|  |_||____/   Cali, CO  ::  2027-1</pre>
   <div class="wrap">
     <a class="logo" href={localized(lang)}>JCMB<span class="blk" aria-hidden="true"></span></a>
-    <nav aria-label="Footer">
+    <nav aria-label={lang === 'es' ? 'Pie de página' : 'Footer'}>
       <a href={localized(lang, 'cv/')}>{lang === 'es' ? 'Ver CV' : 'View CV'}</a>
       <a href={SITE.cv.en} hreflang="en" data-cv="en">CV English</a>
       <a href={SITE.cv.es} hreflang="es" data-cv="es">CV Español</a>

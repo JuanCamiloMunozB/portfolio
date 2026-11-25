@@ -10,8 +10,8 @@ const home = localized(lang);
 <header class="site">
   <div class="wrap">
     <a class="logo" href={home} aria-label={t('homeLabel', lang)}>JCMB<span class="blk" aria-hidden="true"></span></a>
-    <span class="now" aria-hidden="true">jcmb@icesi:<b id="now-path">~</b>$</span>
-    <nav class="main" aria-label="Main">
+    <span class="now" aria-hidden="true">jcmb@swe:<b id="now-path">~</b>$</span>
+    <nav class="main" aria-label={lang === 'es' ? 'Principal' : 'Main'}>
       <a href={`${home}#about`}>{t('navAbout', lang)}</a>
       <a href={`${home}#work`}>{t('navWork', lang)}</a>
       <a href={`${home}#skills`}>{t('navSkills', lang)}</a>

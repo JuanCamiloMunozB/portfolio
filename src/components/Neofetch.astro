@@ -9,12 +9,13 @@ const es = lang === 'es';
 const rows: [string, string, string?][] = [
   [es ? 'Nombre' : 'Name', SITE.name],
   [es ? 'Programa' : 'Program', es ? 'Ingeniería de Sistemas, Universidad Icesi' : 'Software Engineering, Universidad Icesi'],
+  [es ? 'Experiencia' : 'Experience', es ? '4+ años programando: proyectos académicos, de clientes y personales' : '4+ years coding: academic, client and personal projects'],
   [es ? 'Semestre' : 'Semester', es ? '9 de 10' : '9 of 10'],
   [es ? 'Promedio' : 'GPA', `${num(4.6, lang, 1)} / ${num(5, lang, 1)}`],
   [es ? 'Honores' : 'Honors', es ? 'Cuadro de Honor, semestres I a VIII' : "Dean's List, semesters I to VIII"],
-  [es ? 'Becas' : 'Scholarships', es ? 'Beca de Honor (VII), Beca de Excelencia Académica (Saber 11)' : 'Honor Scholarship (VII), Academic Excellence Scholarship (Saber 11)'],
-  [es ? 'Enfoque' : 'Focus', es ? 'arquitectura de software, sistemas intensivos en datos, IA aplicada' : 'software architecture, data-intensive systems, applied AI'],
-  [es ? 'Idiomas' : 'Languages', es ? 'español (nativo), inglés (B2)' : 'Spanish (native), English (B2)'],
+  [es ? 'Becas' : 'Scholarships', es ? 'Beca de Honor (VII), Beca de Excelencia Académica' : 'Honor Scholarship (VII), Academic Excellence Scholarship'],
+  [es ? 'Enfoque' : 'Focus', es ? 'backend, sistemas distribuidos, infraestructura de datos' : 'backend, distributed systems, data infrastructure'],
+  [es ? 'Idiomas' : 'Languages', es ? 'español (nativo), inglés' : 'Spanish (native), English'],
   [es ? 'Ubicación' : 'Location', 'Cali, Colombia (UTC-5)'],
   [es ? 'Grado' : 'Graduation', es ? 'agosto de 2027' : 'August 2027'],
   [es ? 'Práctica' : 'Internship', es ? '6+ meses, cualquier modalidad' : '6+ months, any modality'],
@@ -31,7 +32,7 @@ fill(MARK.j, false); fill(MARK.block, true);
     {cells.map((c) => <rect class={c.a ? 'a' : 'i'} style={`--d:${(c.y * 12 + c.x) * 6}ms`} x={c.x * 9} y={c.y * 9} width="8" height="8" />)}
   </svg>
   <div class="nf-info">
-    <p class="nf-line nf-head"><span class="usr">jcmb</span>@<span class="host">icesi</span></p>
+    <p class="nf-line nf-head"><span class="usr">jcmb</span>@<span class="host">swe</span></p>
     <p class="nf-line nf-sep" aria-hidden="true">--------------------</p>
     <dl>
       {rows.map(([k, v, tone], i) => (
