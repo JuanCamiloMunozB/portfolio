@@ -1,0 +1,45 @@
+---
+/** About me as a neofetch readout: ASCII logo on the left, facts on the right, palette swatches below. */
+import { num, type Lang } from '../i18n/ui';
+import { SITE } from '../data/site';
+import { MARK } from '../data/mark';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const es = lang === 'es';
+const rows: [string, string, string?][] = [
+  [es ? 'Nombre' : 'Name', SITE.name],
+  [es ? 'Programa' : 'Program', es ? 'Ingeniería de Sistemas, Universidad Icesi' : 'Software Engineering, Universidad Icesi'],
+  [es ? 'Semestre' : 'Semester', es ? '9 de 10' : '9 of 10'],
+  [es ? 'Promedio' : 'GPA', `${num(4.6, lang, 1)} / ${num(5, lang, 1)}`],
+  [es ? 'Honores' : 'Honors', es ? 'Cuadro de Honor, semestres I a VIII' : "Dean's List, semesters I to VIII"],
+  [es ? 'Becas' : 'Scholarships', es ? 'Beca de Honor (VII), Beca de Excelencia Académica (Saber 11)' : 'Honor Scholarship (VII), Academic Excellence Scholarship (Saber 11)'],
+  [es ? 'Enfoque' : 'Focus', es ? 'arquitectura de software, sistemas intensivos en datos, IA aplicada' : 'software architecture, data-intensive systems, applied AI'],
+  [es ? 'Idiomas' : 'Languages', es ? 'español (nativo), inglés (B2)' : 'Spanish (native), English (B2)'],
+  [es ? 'Ubicación' : 'Location', 'Cali, Colombia (UTC-5)'],
+  [es ? 'Grado' : 'Graduation', es ? 'agosto de 2027' : 'August 2027'],
+  [es ? 'Práctica' : 'Internship', es ? '6+ meses, cualquier modalidad' : '6+ months, any modality'],
+  [es ? 'Estado' : 'Status', es ? 'disponible para práctica desde 2027-1' : 'open to internships from 2027-1', 'ok'],
+];
+const swatches = ['bg', 'surface', 'surface-2', 'line-strong', 'subtle', 'muted', 'ink', 'accent'];
+// The logo as individual pixel cells, like a terminal drawing with block characters
+const cells: { x: number; y: number; a: boolean }[] = [];
+const fill = (rects: readonly (readonly number[])[], a: boolean) => rects.forEach(([x, y, w, h]) => { for (let i = x; i < x + w; i++) for (let j = y; j < y + h; j++) cells.push({ x: i - 2, y: j - 2, a }); });
+fill(MARK.j, false); fill(MARK.block, true);
+---
+<div class="neofetch">
+  <svg class="nf-logo" viewBox="0 0 108 108" aria-hidden="true">
+    {cells.map((c) => <rect class={c.a ? 'a' : 'i'} style={`--d:${(c.y * 12 + c.x) * 6}ms`} x={c.x * 9} y={c.y * 9} width="8" height="8" />)}
+  </svg>
+  <div class="nf-info">
+    <p class="nf-line nf-head"><span class="usr">jcmb</span>@<span class="host">icesi</span></p>
+    <p class="nf-line nf-sep" aria-hidden="true">--------------------</p>
+    <dl>
+      {rows.map(([k, v, tone], i) => (
+        <div class="nf-line" style={`--i:${i + 2}`}><dt>{k}</dt><dd class={tone}>{v}</dd></div>
+      ))}
+    </dl>
+    <div class="nf-line nf-swatches" style={`--i:${rows.length + 2}`} aria-hidden="true">
+      {swatches.map((s) => <span style={`background:var(--${s})`}></span>)}
+    </div>
+  </div>
+</div>

@@ -1,0 +1,121 @@
+---
+import Base from '../layouts/Base.astro';
+import Scene from './Scene.astro';
+import Diagram from './Diagram.astro';
+import Prompt from './Prompt.astro';
+import { logo } from '../data/logos';
+import { t, tx, num, type Lang } from '../i18n/ui';
+import { SITE, localized } from '../data/site';
+import { featured, type Project } from '../data/projects';
+
+interface Props { lang: Lang; project: Project }
+const { lang, project: p } = Astro.props;
+const cs = p.case!;
+const title = tx(p.title, lang);
+const idx = featured.findIndex((x) => x.slug === p.slug);
+const nextP = featured[(idx + 1) % featured.length];
+const suffix = p.metric?.suffix === '%' && lang === 'es' ? ' %' : p.metric?.suffix ?? '';
+const pct = (v: number, sfx?: string) => (sfx === '%' && lang === 'es' ? ' %' : sfx ?? '');
+const stackTiles = cs.stack.map((n) => ({ name: n, logo: logo(n) }));
+const subject = encodeURIComponent(`${lang === 'es' ? 'Sobre' : 'About'} ${title}`);
+---
+<Base lang={lang} path={`work/${p.slug}/`} title={title} description={tx(p.caption, lang)}>
+  <section class="cs-hero">
+    <div class="wrap">
+      <a class="back" href={`${localized(lang)}#work`}>&lt; {t('csBack', lang)}</a>
+      <div style="margin-top:28px"><Prompt cmd={`cat ${p.slug}.md`} path="~/projects" /></div>
+      <h1>{title}</h1>
+      <p class="lead">{tx(p.caption, lang)} {p.inProgress && <span class="status">{t('inProgress', lang)}</span>}</p>
+      <div class="cs-top">
+        <div class="art"><Scene name={p.scene} label={tx(p.sceneLabel, lang)} /></div>
+        <dl class="credits">
+          <div class="wide"><dt>{t('csRole', lang)}</dt><dd>{tx(cs.role, lang)}</dd></div>
+          <div class="wide"><dt>{t('csPeriod', lang)}</dt><dd>{tx(p.period, lang)}</dd></div>
+          {p.metric && <div class="wide metricbox"><dt>{tx(p.metric.label, lang)}</dt><dd><b data-count={p.metric.value} data-dec={p.metric.decimals ?? 0} data-suffix={suffix}>{num(p.metric.value, lang, p.metric.decimals ?? 0)}{suffix}</b></dd></div>}
+          <div class="wide"><dt>{t('repo', lang)}</dt><dd>
+            {p.repo && <a href={p.repo}>{p.repo.replace('https://github.com/', '')}</a>}
+            {p.repo2 && <><br /><a href={p.repo2}>{p.repo2.replace('https://github.com/', '')}</a></>}
+            {p.privateRepo && <span>{t('privateRepo', lang)}</span>}
+            {p.live && <a href={p.live}>{t('live', lang)}</a>}
+          </dd></div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <section class="cs-sec">
+      <Prompt cmd="cat goal.md" path={`~/projects/${p.slug}`} />
+      <h2>{t('csGoal', lang)}</h2>
+      <p class="goal">{tx(cs.goal, lang)}</p>
+    </section>
+
+    <section class="cs-sec">
+      <Prompt cmd="uml --components" path={`~/projects/${p.slug}`} />
+      <h2>{t('csArch', lang)}</h2>
+      <Diagram diagram={cs.diagram} lang={lang} title={title} />
+    </section>
+
+    <section class="cs-sec">
+      <Prompt cmd="git log --decisions" path={`~/projects/${p.slug}`} />
+      <h2>{t('csDecisions', lang)}</h2>
+      <div class="decisions">
+        {cs.decisions.map((d, i) => (
+          <article class="decision reveal">
+            <div class="route">#{String(i + 1).padStart(2, '0')}</div>
+            <h3>{tx(d.title, lang)}</h3>
+            <dl>
+              <dt>{t('csChose', lang)}</dt><dd>{tx(d.chose, lang)}</dd>
+              <dt>{t('csWhy', lang)}</dt><dd>{tx(d.why, lang)}</dd>
+              <dt>{t('csCost', lang)}</dt><dd class="cost">{tx(d.cost, lang)}</dd>
+            </dl>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    {cs.stats && (
+      <section class="cs-sec">
+        <Prompt cmd="make test" path={`~/projects/${p.slug}`} />
+        <h2>{t('csResults', lang)}</h2>
+        <div class="stats">
+          {cs.stats.map((st) => (
+            <div class="stat reveal">
+              <span class="pass">PASS</span>
+              <b>{st.prefix}<span data-count={st.value} data-dec={st.decimals ?? 0} data-suffix={pct(st.value, st.suffix)}>{num(st.value, lang, st.decimals ?? 0)}{pct(st.value, st.suffix)}</span></b>
+              <span class="lbl2">{tx(st.label, lang)}</span>
+              {st.of && (
+                <div class="bar" role="img" aria-label={`${num(st.value, lang, st.decimals ?? 0)} / ${num(st.of, lang)}`}>
+                  {Array.from({ length: 20 }, (_, i) => <i class={i < Math.round((st.value / st.of!) * 20) ? 'on' : ''} style={`--i:${i}`}></i>)}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+        {cs.notes && <ul class="cs-list notes">{cs.notes.map((r) => <li>{tx(r, lang)}</li>)}</ul>}
+      </section>
+    )}
+
+    <section class="cs-sec">
+      <Prompt cmd="cat stack.txt" path={`~/projects/${p.slug}`} />
+      <h2>{t('csStack', lang)}</h2>
+      <ul class="tiles stack-tiles">
+        {stackTiles.filter((x) => x.logo).map((x) => (
+          <li class="tile in"><svg viewBox={x.logo!.viewBox} aria-hidden="true"><path d={x.logo!.d} /></svg><span>{x.name}</span></li>
+        ))}
+      </ul>
+      {stackTiles.some((x) => !x.logo) && <ul class="concepts" style="margin-top:12px">{stackTiles.filter((x) => !x.logo).map((x) => <li>{x.name}</li>)}</ul>}
+    </section>
+
+    <section class="cs-sec">
+      <Prompt cmd="cat TODO.md" path={`~/projects/${p.slug}`} />
+      <h2>{t('csNext', lang)}</h2>
+      <ul class="cs-list">{cs.next.map((n) => <li>{tx(n, lang)}</li>)}</ul>
+    </section>
+
+    <div class="cs-next">
+      <a class="btn btn-primary" href={`mailto:${SITE.email}?subject=${subject}`}>{t('csAsk', lang)}</a>
+      <a class="nextp" href={localized(lang, `work/${nextP.slug}/`)}><small>{t('csNextTrack', lang)}</small><b>{tx(nextP.title, lang)} /&gt;</b></a>
+    </div>
+  </div>
+</Base>

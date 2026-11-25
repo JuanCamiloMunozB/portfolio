@@ -1,0 +1,9 @@
+---
+import CasePage from '../../../components/CasePage.astro';
+import { featured, type Project } from '../../../data/projects';
+export function getStaticPaths() {
+  return featured.map((project) => ({ params: { slug: project.slug }, props: { project } }));
+}
+const { project } = Astro.props as { project: Project };
+---
+<CasePage lang="es" project={project} />

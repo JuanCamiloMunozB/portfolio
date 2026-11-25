@@ -1,0 +1,24 @@
+---
+import type { Lang } from '../i18n/ui';
+import { SITE, localized, url } from '../data/site';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+---
+<footer class="site">
+  <pre class="ascii-banner wrap" aria-hidden="true">     _  ____  __  __  ____
+    | |/ ___||  \/  || __ )
+ _  | | |    | |\/| ||  _ \
+| |_| | |___ | |  | || |_) |
+ \___/ \____||_|  |_||____/   Cali, CO  ::  2027-1</pre>
+  <div class="wrap">
+    <a class="logo" href={localized(lang)}>JCMB<span class="blk" aria-hidden="true"></span></a>
+    <nav aria-label="Footer">
+      <a href={localized(lang, 'cv/')}>{lang === 'es' ? 'Ver CV' : 'View CV'}</a>
+      <a href={SITE.cv.en} hreflang="en" data-cv="en">CV English</a>
+      <a href={SITE.cv.es} hreflang="es" data-cv="es">CV Español</a>
+      <a href={SITE.github}>GitHub</a>
+      <a href={SITE.linkedin}>LinkedIn</a>
+      <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+    </nav>
+  </div>
+</footer>

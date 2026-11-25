@@ -1,0 +1,6 @@
+---
+/** A shell prompt that types its command when it scrolls into view. */
+interface Props { cmd: string; path?: string }
+const { cmd, path = '~' } = Astro.props;
+---
+<div class="prompt" aria-label={`$ ${cmd}`}><span class="usr" aria-hidden="true">jcmb@icesi</span><span aria-hidden="true">:</span><span class="path" aria-hidden="true">{path}</span><span aria-hidden="true">$ </span><span class="cmd" aria-hidden="true" style={`--n:${cmd.length}`}>{cmd}</span><span class="caret" aria-hidden="true"></span></div>

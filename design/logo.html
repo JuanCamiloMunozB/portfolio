@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Logo options</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&family=Jersey+10&display=swap" rel="stylesheet">
+<style>
+  :root, :root[data-theme="dark"] {
+    --bg:#0e0f11; --surface:#15171a; --surface-2:#1c1f23; --line:#262a2f; --line-strong:#3a3f46;
+    --ink:#ecebe7; --muted:#a2a7ad; --subtle:#878d94; --accent:#f2a33a; --accent-ink:#1a1205; --accent-soft:#2a2012;
+  }
+  .light {
+    --bg:#f6f5f1; --surface:#ffffff; --surface-2:#eeece6; --line:#dedbd3; --line-strong:#bdb9af;
+    --ink:#15171a; --muted:#555b62; --subtle:#62676e; --accent:#9c4e00; --accent-ink:#ffffff; --accent-soft:#f6e7d3;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0e0f11; color: #ecebe7; font: 400 1rem/1.5 "Atkinson Hyperlegible", sans-serif; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 40px 16px 80px; }
+  h1 { font: 400 3rem/1 "Jersey 10", sans-serif; margin: 0 0 8px; }
+  .lede { color: #a2a7ad; margin: 0 0 40px; }
+  .option { border-top: 2px solid #ecebe7; padding: 28px 0 40px; }
+  .option h2 { font: 400 2rem/1 "Jersey 10", sans-serif; margin: 0 0 6px; }
+  .option p { color: #a2a7ad; margin: 0 0 20px; max-width: 70ch; }
+  .rec { font: 600 .75rem "JetBrains Mono", monospace; background: #f2a33a; color: #1a1205; padding: 2px 8px; margin-left: 10px; vertical-align: middle; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .panel { background: var(--bg); color: var(--ink); border: 1px solid var(--line-strong); padding: 28px; display: grid; gap: 28px; }
+  .big { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }
+  .sizes { display: flex; align-items: end; gap: 18px; }
+  .sizes span { font: 400 .75rem "JetBrains Mono", monospace; color: var(--subtle); display: block; margin-top: 6px; text-align: center; }
+  .lockup { display: flex; align-items: center; gap: 12px; }
+  .lockup b { font: 400 1.75rem/1 "Jersey 10", sans-serif; font-weight: 400; }
+  .lockup small { display: block; font: 400 .75rem "JetBrains Mono", monospace; color: var(--muted); }
+  svg { display: block; shape-rendering: crispEdges; }
+  .wordmark { font: 400 3.5rem/1 "Jersey 10", sans-serif; }
+  .wordmark .cur { color: var(--accent); }
+  @media (max-width: 760px) { .row { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Logo options</h1>
+  <p class="lede">Three directions, each shown in both themes, at large size, at favicon sizes and in the header lockup.</p>
+
+  <section class="option">
+    <h2>A. Pad J <span class="rec">Recommended</span></h2>
+    <p>A 4 by 4 grid of square pads. The lit pads draw a J. It reads as a drum machine pad bank, a pixel letter and a rack of services at the same time, and it still works at 16 px.</p>
+    <div class="row" data-logo="padj"></div>
+  </section>
+
+  <section class="option">
+    <h2>B. Signal path</h2>
+    <p>Four rows of pads stand for four layers of a system. One pad lights per row and a trace connects them, so the mark is the positioning itself: one decision traveling through every layer.</p>
+    <div class="row" data-logo="path"></div>
+  </section>
+
+  <section class="option">
+    <h2>C. Wordmark</h2>
+    <p>Initials in the pixel display font with an amber cursor block. The simplest to apply anywhere, and the least distinctive.</p>
+    <div class="row" data-logo="word"></div>
+  </section>
+</div>
+
+<script>
+const NS = 'http://www.w3.org/2000/svg';
+// 4x4 pad masks, row by row. 1 = lit (accent), 0 = unlit pad.
+const PADJ = ['0111','0010','1010','1110'];
+const PATH = [0, 1, 3, 2]; // lit column per row
+
+function pads(size, mode) {
+  const u = 4, g = 1, n = 4, s = n * u + (n - 1) * g; // 19 units
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('viewBox', `0 0 ${s} ${s}`); svg.setAttribute('width', size); svg.setAttribute('height', size);
+  svg.setAttribute('role', 'img'); svg.setAttribute('aria-label', 'JCMB logo');
+  const rect = (x, y, w, h, fill) => { const e = document.createElementNS(NS, 'rect'); Object.entries({ x, y, width: w, height: h }).forEach(([k, v]) => e.setAttribute(k, v)); e.style.fill = fill; svg.appendChild(e); };
+  if (mode === 'path') {
+    // trace between lit pads, drawn first so pads sit on top
+    for (let r = 0; r < n - 1; r++) {
+      const a = PATH[r], b = PATH[r + 1], x = Math.min(a, b) * (u + g) + 1.5;
+      rect(x, r * (u + g) + u, Math.abs(a - b) * (u + g) + 1, g, 'var(--accent)');
+    }
+  }
+  for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) {
+    const lit = mode === 'padj' ? PADJ[r][c] === '1' : PATH[r] === c;
+    rect(c * (u + g), r * (u + g), u, u, lit ? 'var(--accent)' : 'var(--line-strong)');
+  }
+  return svg;
+}
+
+function wordmark(px) {
+  const d = document.createElement('div'); d.className = 'wordmark'; d.style.fontSize = px + 'px';
+  d.innerHTML = 'jcmb<span class="cur">_</span>'; return d;
+}
+
+document.querySelectorAll('[data-logo]').forEach(row => {
+  const mode = row.dataset.logo;
+  ['', 'light'].forEach(theme => {
+    const p = document.createElement('div'); p.className = 'panel ' + theme;
+    const big = document.createElement('div'); big.className = 'big';
+    big.appendChild(mode === 'word' ? wordmark(96) : pads(152, mode));
+    const sizes = document.createElement('div'); sizes.className = 'sizes';
+    [16, 32, 48].forEach(sz => {
+      const w = document.createElement('div');
+      w.appendChild(mode === 'word' ? wordmark(sz) : pads(sz, mode));
+      const l = document.createElement('span'); l.textContent = sz + ' px'; w.appendChild(l); sizes.appendChild(w);
+    });
+    big.appendChild(sizes);
+    const lock = document.createElement('div'); lock.className = 'lockup';
+    if (mode !== 'word') lock.appendChild(pads(32, mode));
+    const t = document.createElement('div'); t.innerHTML = '<b>Juan Camilo Muñoz</b><small>software engineering</small>'; lock.appendChild(t);
+    p.append(big, lock); row.appendChild(p);
+  });
+});
+</script>
+</body>
+</html>

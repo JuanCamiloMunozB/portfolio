@@ -1,0 +1,314 @@
+---
+/**
+ * Animated pixel scenes. Each one shows what a project, certification or skill area
+ * does, drawn only with palette tokens so it follows the theme.
+ */
+interface Props { name: string; label?: string }
+const { name, label } = Astro.props;
+const role = label ? 'img' : undefined;
+const hidden = label ? undefined : 'true';
+
+// IRL radar: six readiness axes around (48,30). Profile A is the first diagnosis (weakest axis:
+// lower right), B is after INNLAB services close that gap. The polygon morphs between them.
+const AXES = [[0, -26], [22.5, -13], [22.5, 13], [0, 26], [-22.5, 13], [-22.5, -13]];
+const pts = (v: number[]) => v.map((k, i) => `${(48 + AXES[i][0] * k).toFixed(1)},${(30 + AXES[i][1] * k).toFixed(1)}`).join(' ');
+const RADAR_A = pts([0.8, 0.7, 0.35, 0.75, 0.6, 0.65]);
+const RADAR_B = pts([0.85, 0.75, 0.75, 0.8, 0.65, 0.7]);
+const GAP_A = [48 + 22.5 * 0.35, 30 + 13 * 0.35], GAP_B = [48 + 22.5 * 0.75, 30 + 13 * 0.75];
+---
+{name === 'circleguard' && (
+  <svg class="px" viewBox="0 0 120 60" role={role} aria-label={label} aria-hidden={hidden}>
+    <rect class="ls" x="4" y="8" width="20" height="44" /><rect class="s" x="5" y="11" width="18" height="36" /><rect class="m" x="11" y="49" width="6" height="1" />
+    <rect class="i" x="7" y="17" width="2" height="2" /><rect class="i" x="9" y="17" width="2" height="2" /><rect class="i" x="11" y="17" width="2" height="2" /><rect class="i" x="15" y="17" width="2" height="2" /><rect class="i" x="17" y="17" width="2" height="2" /><rect class="i" x="19" y="17" width="2" height="2" /><rect class="i" x="7" y="19" width="2" height="2" /><rect class="i" x="11" y="19" width="2" height="2" /><rect class="i" x="15" y="19" width="2" height="2" /><rect class="i" x="19" y="19" width="2" height="2" /><rect class="i" x="7" y="21" width="2" height="2" /><rect class="i" x="9" y="21" width="2" height="2" /><rect class="i" x="11" y="21" width="2" height="2" /><rect class="i" x="15" y="21" width="2" height="2" /><rect class="i" x="17" y="21" width="2" height="2" /><rect class="i" x="19" y="21" width="2" height="2" /><rect class="i" x="13" y="23" width="2" height="2" /><rect class="i" x="7" y="25" width="2" height="2" /><rect class="i" x="9" y="25" width="2" height="2" /><rect class="i" x="13" y="25" width="2" height="2" /><rect class="i" x="17" y="25" width="2" height="2" /><rect class="i" x="19" y="25" width="2" height="2" /><rect class="i" x="9" y="27" width="2" height="2" /><rect class="i" x="11" y="27" width="2" height="2" /><rect class="i" x="15" y="27" width="2" height="2" /><rect class="i" x="19" y="27" width="2" height="2" /><rect class="i" x="7" y="29" width="2" height="2" /><rect class="i" x="11" y="29" width="2" height="2" /><rect class="i" x="13" y="29" width="2" height="2" /><rect class="i" x="15" y="29" width="2" height="2" /><rect class="i" x="19" y="29" width="2" height="2" />
+    <rect class="a" x="6" y="17" width="16" height="1"><animate attributeName="y" values="16;31;16" dur="2s" repeatCount="indefinite" /></rect>
+    <line class="dash-a flow" x1="25" y1="30" x2="36" y2="20" />
+    <g fill="none"><line class="infs" style="animation-delay:0.6s" x1="42" y1="17" x2="66" y2="32" /><line class="infs" style="animation-delay:0.6s" x1="42" y1="47" x2="66" y2="32" /><line class="infs" style="animation-delay:1s" x1="66" y1="32" x2="90" y2="15" /><line class="infs" style="animation-delay:1s" x1="66" y1="32" x2="90" y2="49" /><line class="infs" style="animation-delay:1.4s" x1="90" y1="15" x2="110" y2="32" /><line class="infs" style="animation-delay:1.4s" x1="90" y1="49" x2="110" y2="32" /><line class="infs" style="animation-delay:0.2s" x1="42" y1="17" x2="42" y2="47" /></g>
+    <g class="inf" style="animation-delay:0s"><rect x="40" y="9" width="4" height="4" /><rect x="39" y="14" width="6" height="6" /></g><g class="tagflip" style="animation-delay:0s"><rect class="as" x="37" y="22" width="10" height="4" /><rect class="a" x="39" y="23" width="2" height="2" /><rect class="a" x="43" y="23" width="2" height="2" /></g><g class="inf" style="animation-delay:0.4s"><rect x="40" y="39" width="4" height="4" /><rect x="39" y="44" width="6" height="6" /></g><g class="tagflip" style="animation-delay:0.4s"><rect class="as" x="37" y="52" width="10" height="4" /><rect class="a" x="39" y="53" width="2" height="2" /><rect class="a" x="43" y="53" width="2" height="2" /></g><g class="inf" style="animation-delay:0.8s"><rect x="64" y="24" width="4" height="4" /><rect x="63" y="29" width="6" height="6" /></g><g class="tagflip" style="animation-delay:0.8s"><rect class="as" x="61" y="37" width="10" height="4" /><rect class="a" x="63" y="38" width="2" height="2" /><rect class="a" x="67" y="38" width="2" height="2" /></g><g class="inf" style="animation-delay:1.2s"><rect x="88" y="7" width="4" height="4" /><rect x="87" y="12" width="6" height="6" /></g><g class="tagflip" style="animation-delay:1.2s"><rect class="as" x="85" y="20" width="10" height="4" /><rect class="a" x="87" y="21" width="2" height="2" /><rect class="a" x="91" y="21" width="2" height="2" /></g><g class="inf" style="animation-delay:1.2s"><rect x="88" y="41" width="4" height="4" /><rect x="87" y="46" width="6" height="6" /></g><g class="tagflip" style="animation-delay:1.2s"><rect class="as" x="85" y="54" width="10" height="4" /><rect class="a" x="87" y="55" width="2" height="2" /><rect class="a" x="91" y="55" width="2" height="2" /></g><g class="inf" style="animation-delay:1.6s"><rect x="108" y="24" width="4" height="4" /><rect x="107" y="29" width="6" height="6" /></g><g class="tagflip" style="animation-delay:1.6s"><rect class="as" x="105" y="37" width="10" height="4" /><rect class="a" x="107" y="38" width="2" height="2" /><rect class="a" x="111" y="38" width="2" height="2" /></g>
+    <g><rect class="m" x="106" y="2" width="1" height="4" /><rect class="m" x="111" y="2" width="1" height="4" /><rect class="m" x="107" y="1" width="4" height="1" /><rect class="a" x="105" y="6" width="8" height="6" /><rect class="ai" x="108" y="8" width="2" height="2" /></g>
+  </svg>
+)}
+
+{name === 'churn' && (
+  <svg class="px" viewBox="0 0 120 60" role={role} aria-label={label} aria-hidden={hidden}>
+    <rect class="m" x="8" y="6" width="1" height="48" /><rect class="m" x="8" y="53" width="92" height="1" />
+    <line class="thresh" x1="9" y1="36" x2="100" y2="36" />
+    <polyline class="drawline" pathLength="100" points="10,26 20,26 20,22 30,22 30,24 40,24 40,18 50,18 50,22 60,22 60,20 70,20 70,26 80,26 80,30 90,30 90,46 99,46" />
+    <g class="bell"><rect x="104" y="20" width="10" height="9" /><rect x="102" y="29" width="14" height="2" /><rect x="108" y="17" width="2" height="3" /><rect x="107" y="32" width="4" height="2" /></g>
+  </svg>
+)}
+
+{name === 'irl' && (
+  <svg class="px" viewBox="0 0 120 60" role={role} aria-label={label} aria-hidden={hidden}>
+    <polygon class="hexl" points="48,4 70.5,17 70.5,43 48,56 25.5,43 25.5,17" />
+    <polygon class="hexl" points="48,17 59.3,23.5 59.3,36.5 48,43 36.7,36.5 36.7,23.5" />
+    <polygon class="hexl" points="48,22.2 54.8,26.1 54.8,33.9 48,37.8 41.3,33.9 41.3,26.1" />
+    <g class="hexl"><line x1="48" y1="30" x2="48" y2="4" /><line x1="48" y1="30" x2="70.5" y2="17" /><line x1="48" y1="30" x2="70.5" y2="43" /><line x1="48" y1="30" x2="48" y2="56" /><line x1="48" y1="30" x2="25.5" y2="43" /><line x1="48" y1="30" x2="25.5" y2="17" /></g>
+    <polygon class="radar" points={RADAR_A}>
+      <animate attributeName="points" values={`${RADAR_A};${RADAR_A};${RADAR_B};${RADAR_B};${RADAR_A}`} keyTimes="0;.25;.5;.85;1" dur="4s" repeatCount="indefinite" calcMode="spline" keySplines=".4 0 .2 1;.4 0 .2 1;.4 0 .2 1;.4 0 .2 1" />
+    </polygon>
+    <line class="dash-a" x1={GAP_A[0]} y1={GAP_A[1]} x2="94" y2="36">
+      <animate attributeName="x1" values={`${GAP_A[0]};${GAP_A[0]};${GAP_B[0]};${GAP_B[0]};${GAP_A[0]}`} keyTimes="0;.25;.5;.85;1" dur="4s" repeatCount="indefinite" />
+      <animate attributeName="y1" values={`${GAP_A[1]};${GAP_A[1]};${GAP_B[1]};${GAP_B[1]};${GAP_A[1]}`} keyTimes="0;.25;.5;.85;1" dur="4s" repeatCount="indefinite" />
+    </line>
+    <rect class="led" x="-2.5" y="-2.5" width="5" height="5">
+      <animateMotion dur="4s" repeatCount="indefinite" keyTimes="0;.25;.5;.85;1" keyPoints="0;0;1;1;0" calcMode="linear" path={`M${GAP_A[0]} ${GAP_A[1]} L${GAP_B[0]} ${GAP_B[1]}`} />
+    </rect>
+    <rect class="s2" x="94" y="28" width="20" height="16" style="stroke:var(--accent);stroke-width:1" />
+    <rect class="a" x="98" y="32" width="12" height="2" /><rect class="m" x="98" y="36" width="8" height="2" /><rect class="m" x="98" y="40" width="10" height="1" />
+  </svg>
+)}
+
+{name === 'postgrados' && (
+  <svg class="px" viewBox="0 0 120 60" role={role} aria-label={label} aria-hidden={hidden}>
+    <g><rect class="ls" x="4" y="20" width="22" height="20" /><rect class="s" x="5" y="21" width="20" height="18" />
+      <rect class="ls" x="5" y="25" width="20" height="1" /><rect class="ls" x="5" y="30" width="20" height="1" /><rect class="ls" x="5" y="35" width="20" height="1" /><rect class="ls" x="11" y="21" width="1" height="18" /><rect class="ls" x="18" y="21" width="1" height="18" /></g>
+    <g class="wire"><line x1="27" y1="30" x2="35" y2="30" /><line x1="57" y1="30" x2="63" y2="30" /><line x1="85" y1="30" x2="91" y2="30" /></g>
+    <rect class="stbox" x="35.5" y="22.5" width="21" height="15" /><rect class="stbox" x="63.5" y="22.5" width="21" height="15" /><rect class="stbox" x="91.5" y="22.5" width="21" height="15" />
+    <path class="loop" d="M70 22 C 70 12, 78 12, 78 22" /><rect class="a" x="77" y="19" width="2" height="2" />
+    <g class="check"><rect class="a" x="97" y="30" width="2" height="2" /><rect class="a" x="99" y="32" width="2" height="2" /><rect class="a" x="101" y="30" width="2" height="2" /><rect class="a" x="103" y="28" width="2" height="2" /><rect class="a" x="105" y="26" width="2" height="2" /></g>
+    <rect class="a" x="-3" y="-3" width="6" height="6"><animateMotion dur="4s" repeatCount="indefinite" path="M15 30 H102" keyPoints="0;.356;.356;.678;.678;1;1" keyTimes="0;.18;.32;.5;.64;.82;1" calcMode="linear" /></rect>
+  </svg>
+)}
+
+{name === 'jugandoando' && (
+  <svg class="px" viewBox="0 0 120 60" role={role} aria-label={label} aria-hidden={hidden}>
+    <rect class="fall a" x="50" y="30" width="7" height="7" />
+    <rect class="fall m" style="animation-delay:-1s" x="59" y="28" width="8" height="9" />
+    <rect class="fall i" style="animation-delay:-2s" x="69" y="31" width="6" height="6" />
+    <g><rect class="m" x="36" y="26" width="8" height="2" /><rect class="m" x="42" y="28" width="2" height="12" />
+      <rect class="ls" x="44" y="37" width="38" height="2" /><rect class="ls" x="44" y="28" width="2" height="10" /><rect class="ls" x="80" y="28" width="2" height="10" />
+      <rect class="ls" x="46" y="32" width="34" height="1" /><rect class="ls" x="44" y="40" width="38" height="2" />
+      <rect class="m" x="48" y="44" width="5" height="5" /><rect class="m" x="72" y="44" width="5" height="5" /></g>
+    <g class="pop"><rect class="a" x="88" y="8" width="24" height="12" /><rect class="a" x="92" y="20" width="3" height="3" />
+      <rect class="ai" x="92" y="12" width="12" height="2" /><rect class="ai" x="92" y="16" width="8" height="1" /></g>
+  </svg>
+)}
+
+{name === 'ciencia' && (
+  <svg class="px" viewBox="0 0 150 60" role={role} aria-label={label} aria-hidden={hidden}>
+    <g class="bob"><rect class="m" x="10" y="16" width="16" height="2" /><rect class="m" x="10" y="30" width="16" height="2" /><rect class="m" x="8" y="18" width="2" height="12" /><rect class="m" x="26" y="18" width="2" height="12" /><rect class="m" x="27" y="32" width="3" height="3" /><rect class="m" x="30" y="35" width="3" height="3" /></g>
+    <g>
+      <g class="rr-down"><rect class="s2" x="48" y="8" width="92" height="10" /><rect class="m" x="52" y="12" width="40" height="2" /></g>
+      <g class="rr-down"><rect class="s2" x="48" y="21" width="92" height="10" /><rect class="m" x="52" y="25" width="30" height="2" /></g>
+      <g class="rr-up"><rect class="as" x="48" y="34" width="92" height="10" style="stroke:var(--accent);stroke-width:1" /><rect class="a" x="52" y="38" width="48" height="2" /></g>
+      <rect class="s2" x="48" y="47" width="92" height="10" /><rect class="m" x="52" y="51" width="24" height="2" />
+    </g>
+  </svg>
+)}
+
+{name === 'har' && (
+  <svg class="px" viewBox="0 0 150 60" role={role} aria-label={label} aria-hidden={hidden}>
+    <rect class="ls" x="40" y="4" width="70" height="52" style="fill:none;stroke:var(--line-strong);stroke-width:1" />
+    <g class="pose-a">
+      <line class="wire" x1="75" y1="18" x2="75" y2="36" /><line class="wire" x1="75" y1="22" x2="64" y2="30" /><line class="wire" x1="75" y1="22" x2="86" y2="14" />
+      <line class="wire" x1="75" y1="36" x2="68" y2="50" /><line class="wire" x1="75" y1="36" x2="83" y2="50" />
+      <rect class="a" x="62" y="28" width="4" height="4" /><rect class="a" x="84" y="12" width="4" height="4" /><rect class="a" x="66" y="48" width="4" height="4" /><rect class="a" x="81" y="48" width="4" height="4" />
+    </g>
+    <g class="pose-b">
+      <line class="wire" x1="75" y1="18" x2="75" y2="36" /><line class="wire" x1="75" y1="22" x2="64" y2="14" /><line class="wire" x1="75" y1="22" x2="86" y2="30" />
+      <line class="wire" x1="75" y1="36" x2="70" y2="50" /><line class="wire" x1="75" y1="36" x2="80" y2="50" />
+      <rect class="a" x="62" y="12" width="4" height="4" /><rect class="a" x="84" y="28" width="4" height="4" /><rect class="a" x="68" y="48" width="4" height="4" /><rect class="a" x="78" y="48" width="4" height="4" />
+    </g>
+    <rect class="i" x="71" y="9" width="8" height="8" /><rect class="a" x="73" y="34" width="4" height="4" /><rect class="a" x="73" y="20" width="4" height="4" />
+    <g><rect class="m" x="118" y="14" width="22" height="2" /><rect class="sb" x="118" y="20" width="16" height="2" /><rect class="m" x="118" y="26" width="19" height="2" /><rect class="a blinkc" x="118" y="32" width="10" height="2" /></g>
+    <g><rect class="ls" x="8" y="14" width="22" height="14" /><rect class="ls" x="8" y="32" width="22" height="14" /><rect class="s2" x="10" y="16" width="18" height="10" /><rect class="s2" x="10" y="34" width="18" height="10" /></g>
+  </svg>
+)}
+
+{name === 'bakery' && (
+  <svg class="px" viewBox="0 0 150 60" role={role} aria-label={label} aria-hidden={hidden}>
+    <g><rect class="a" x="10" y="20" width="22" height="10" /><rect class="a" x="12" y="18" width="18" height="2" /><rect class="ai" x="15" y="22" width="2" height="4" /><rect class="ai" x="20" y="22" width="2" height="4" /><rect class="ai" x="25" y="22" width="2" height="4" /><rect class="ls" x="8" y="30" width="26" height="2" /></g>
+    <rect class="m" x="44" y="8" width="1" height="46" /><rect class="m" x="44" y="53" width="70" height="1" />
+    {[0, 1, 2, 3, 4, 5, 6].map((i) => (
+      <rect class={i === 6 ? 'rise a' : 'rise m'} style={`animation-delay:${i * 0.15}s`} x={48 + i * 9} y={53 - [14, 22, 18, 30, 26, 34, 40][i]} width="6" height={[14, 22, 18, 30, 26, 34, 40][i]} />
+    ))}
+    <g><rect class="ls" x="122" y="10" width="22" height="30" /><rect class="s" x="123" y="11" width="20" height="28" /><rect class="m" x="126" y="15" width="14" height="2" /><rect class="sb" x="126" y="20" width="10" height="2" /><rect class="sb" x="126" y="25" width="12" height="2" /><rect class="a check" x="126" y="31" width="14" height="4" /></g>
+  </svg>
+)}
+
+{name === 'pipeline' && (
+  <svg class="px" viewBox="0 0 150 60" role={role} aria-label={label} aria-hidden={hidden}>
+    {['go', 'node', 'java'].map((lang, r) => (
+      <g>
+        <text class="lbl" x="14" y={15 + r * 17} style="text-anchor:start">{lang}</text>
+        <line class="wire flow" x1="34" y1={13 + r * 17} x2="112" y2={13 + r * 17} />
+        {[0, 1, 2].map((c) => (
+          <rect class="stage" style={`animation-delay:${c * 0.6 + r * 0.2}s`} x={40 + c * 24} y={8 + r * 17} width="14" height="10" />
+        ))}
+      </g>
+    ))}
+    <g class="bob"><rect class="a" x="118" y="18" width="24" height="22" /><rect class="ai" x="118" y="24" width="24" height="1" /><rect class="ai" x="118" y="30" width="24" height="1" /><rect class="ai" x="124" y="18" width="1" height="22" /><rect class="ai" x="135" y="18" width="1" height="22" /></g>
+  </svg>
+)}
+
+{name === 'b-library' && (
+  <svg class="px" viewBox="0 0 32 32" aria-hidden="true">
+    <rect class="ls" x="2" y="2" width="8" height="8" /><rect class="ls" x="22" y="2" width="8" height="8" /><rect class="ls" x="2" y="22" width="8" height="8" /><rect class="ls" x="22" y="22" width="8" height="8" />
+    <rect class="a" x="-2" y="-2" width="4" height="4"><animateMotion dur="2.66s" repeatCount="indefinite" path="M6 6 H26 V26 H6 Z" /></rect>
+  </svg>
+)}
+{name === 'b-bayes' && (
+  <svg class="px" viewBox="0 0 32 32" aria-hidden="true">
+    {[3, 7, 13, 20, 13, 7, 3].map((h, i) => <rect class={i === 3 ? 'rise a' : 'rise m'} style={`animation-delay:${i * 0.1}s`} x={2 + i * 4} y={28 - h} width="3" height={h} />)}
+    <rect class="m" x="1" y="28" width="30" height="1" />
+  </svg>
+)}
+{name === 'b-tasks' && (
+  <svg class="px" viewBox="0 0 32 32" aria-hidden="true">
+    {[0, 1, 2].map((i) => (<g><rect class="ls" x="3" y={4 + i * 9} width="6" height="6" /><rect class="pop a" style={`animation-delay:${i * 0.5}s`} x="4" y={5 + i * 9} width="4" height="4" /><rect class="m" x="12" y={6 + i * 9} width={16 - i * 3} height="2" /></g>))}
+  </svg>
+)}
+{name === 'b-poly' && (
+  <svg class="px" viewBox="0 0 32 32" aria-hidden="true">
+    <g class="bob"><rect class="a" x="2" y="10" width="8" height="14" /><rect class="ai" x="2" y="14" width="8" height="1" /><rect class="ai" x="2" y="19" width="8" height="1" /></g>
+    <g class="bob" style="animation-delay:-.4s"><rect class="m" x="12" y="10" width="8" height="14" /><rect class="b" x="14" y="13" width="4" height="1" /><rect class="b" x="14" y="16" width="3" height="1" /><rect class="b" x="14" y="19" width="4" height="1" /></g>
+    <g class="bob" style="animation-delay:-.8s"><rect class="ls" x="22" y="10" width="8" height="14" /><rect class="a" x="23" y="11" width="2" height="2" /><rect class="a" x="27" y="15" width="2" height="2" /><rect class="a" x="23" y="20" width="2" height="2" /></g>
+  </svg>
+)}
+{name === 'b-lock' && (
+  <svg class="px" viewBox="0 0 32 32" aria-hidden="true">
+    <g class="shake"><rect class="m" x="10" y="6" width="2" height="8" /><rect class="m" x="20" y="6" width="2" height="8" /><rect class="m" x="12" y="4" width="8" height="2" /><rect class="a" x="7" y="14" width="18" height="14" /><rect class="ai" x="15" y="18" width="2" height="6" /></g>
+  </svg>
+)}
+{name === 'next' && (
+  <svg class="px" viewBox="0 0 32 32" aria-hidden="true">
+    <rect x="3.5" y="3.5" width="25" height="25" class="dash-a flow" />
+    <rect class="a blinkc" x="13" y="13" width="6" height="6" />
+  </svg>
+)}
+
+{name === 'c-architect' && (
+  <svg class="px" viewBox="0 0 90 60" role={role} aria-label={label} aria-hidden={hidden}>
+    <rect class="dash-a flow" x="4.5" y="4.5" width="81" height="51" />
+    <text class="lbl" x="16" y="11">vpc</text>
+    <g class="wire"><line x1="45" y1="17" x2="27" y2="27" /><line x1="45" y1="17" x2="63" y2="27" /><line x1="27" y1="37" x2="45" y2="45" /><line x1="63" y1="37" x2="45" y2="45" /></g>
+    <rect class="a" x="33" y="11" width="24" height="6" /><rect class="ai" x="37" y="13" width="16" height="2" />
+    <g><rect class="ls" x="18" y="27" width="18" height="10" /><rect class="s2" x="19" y="28" width="16" height="8" /><rect class="led" x="21" y="30" width="2" height="2" /><rect class="ls" x="25" y="30" width="8" height="1" /><rect class="ls" x="25" y="33" width="8" height="1" /></g>
+    <g><rect class="ls" x="54" y="27" width="18" height="10" /><rect class="s2" x="55" y="28" width="16" height="8" /><rect class="led" style="animation-delay:-.6s" x="57" y="30" width="2" height="2" /><rect class="ls" x="61" y="30" width="8" height="1" /><rect class="ls" x="61" y="33" width="8" height="1" /></g>
+    <g><rect class="i" x="37" y="44" width="16" height="8" /><rect class="ls" x="37" y="47" width="16" height="1" /></g>
+    <rect class="a" x="-1.5" y="-1.5" width="3" height="3"><animateMotion dur="2.4s" repeatCount="indefinite" path="M45 17 L27 27 L27 37 L45 45" /></rect>
+    <rect class="i" x="-1.5" y="-1.5" width="3" height="3"><animateMotion dur="2.4s" begin="-1.2s" repeatCount="indefinite" path="M45 17 L63 27 L63 37 L45 45" /></rect>
+  </svg>
+)}
+{name === 'c-scale' && (
+  <svg class="px" viewBox="0 0 90 60" role={role} aria-label={label} aria-hidden={hidden}>
+    <g><rect class="ls" x="6" y="18" width="78" height="38" /><rect class="ls" x="16" y="10" width="26" height="10" /><rect class="ls" x="36" y="4" width="30" height="16" /><rect class="ls" x="62" y="12" width="16" height="8" />
+      <rect class="s" x="7" y="19" width="76" height="36" /><rect class="s" x="17" y="11" width="24" height="9" /><rect class="s" x="37" y="5" width="28" height="15" /><rect class="s" x="63" y="13" width="14" height="7" /></g>
+    <g class="boot"><rect x="14" y="28" width="14" height="14" /><rect x="11" y="31" width="3" height="2" /><rect x="11" y="37" width="3" height="2" /><rect x="28" y="31" width="3" height="2" /><rect x="28" y="37" width="3" height="2" /><rect x="17" y="25" width="2" height="3" /><rect x="23" y="25" width="2" height="3" /></g>
+    <rect class="b" x="18" y="32" width="6" height="6" />
+    <g class="boot" style="animation-delay:.6s"><rect x="39" y="27" width="14" height="3" /><rect x="40" y="30" width="12" height="13" /><rect x="39" y="43" width="14" height="2" /></g>
+    <rect class="b" x="42" y="34" width="8" height="1" /><rect class="b" x="42" y="38" width="8" height="1" />
+    <g class="wire"><line x1="64" y1="29" x2="74" y2="29" /><line x1="64" y1="29" x2="69" y2="40" /><line x1="74" y1="29" x2="69" y2="40" /></g>
+    <g class="boot" style="animation-delay:1.2s"><rect x="61" y="26" width="6" height="6" /><rect x="71" y="26" width="6" height="6" /><rect x="66" y="37" width="6" height="6" /></g>
+    <text class="lbl" x="21" y="52">vm</text><text class="lbl" x="46" y="52">disk</text><text class="lbl" x="69" y="52">net</text>
+  </svg>
+)}
+{name === 'c-docs' && (
+  <svg class="px" viewBox="0 0 90 60" role={role} aria-label={label} aria-hidden={hidden}>
+    <g><rect class="ls" x="4" y="10" width="34" height="40" /><rect class="s" x="5" y="11" width="32" height="38" />
+      <text x="8" y="19" style="font:400 7px 'JetBrains Mono',monospace;fill:var(--accent)">{'{'}</text><text x="8" y="47" style="font:400 7px 'JetBrains Mono',monospace;fill:var(--accent)">{'}'}</text>
+      <rect class="typeline m" x="12" y="22" width="20" height="2" /><rect class="typeline sb" style="animation-delay:.4s" x="12" y="28" width="16" height="2" /><rect class="typeline m" style="animation-delay:.8s" x="12" y="34" width="22" height="2" /><rect class="typeline sb" style="animation-delay:1.2s" x="12" y="40" width="12" height="2" /></g>
+    <g class="wire"><line x1="40" y1="30" x2="50" y2="30" /></g>
+    <g><rect class="ls" x="56" y="40" width="28" height="10" /><rect class="s2" x="57" y="41" width="26" height="8" /><rect class="ls" x="56" y="29" width="28" height="10" /><rect class="s2" x="57" y="30" width="26" height="8" /></g>
+    <g class="file"><rect class="a" x="56" y="18" width="28" height="10" /><rect class="ai" x="60" y="21" width="14" height="1" /><rect class="ai" x="60" y="24" width="10" height="1" /></g>
+    <text class="lbl" x="70" y="57">collection</text>
+  </svg>
+)}
+{name === 'c-board' && (
+  <svg class="px" viewBox="0 0 90 60" role={role} aria-label={label} aria-hidden={hidden}>
+    <circle cx="17" cy="30" r="11" fill="none" stroke="var(--line-strong)" stroke-width="2" />
+    <g class="orbit"><rect class="a" x="15" y="17" width="4" height="4" /><rect class="a" x="19" y="18" width="2" height="2" /></g>
+    <text class="lbl" x="17" y="32">sprint</text>
+    {[0, 1, 2].map((c) => (<g><rect class="ls" x={36 + c * 18} y="8" width="16" height="46" /><rect class="s2" x={37 + c * 18} y="9" width="14" height="44" /><rect class={c === 2 ? 'a' : 'm'} x={39 + c * 18} y="12" width="10" height="2" /><rect class="s" x={39 + c * 18} y="40" width="10" height="8" /></g>))}
+    <g class="slide18"><rect class="a" x="38" y="20" width="12" height="11" /><rect class="ai" x="40" y="23" width="8" height="1" /><rect class="ai" x="40" y="26" width="5" height="1" /></g>
+  </svg>
+)}
+
+{name === 'i-backend' && (
+  <svg class="px" viewBox="0 0 32 32" aria-hidden="true">
+    <rect class="ls" x="6" y="3" width="20" height="26" /><rect class="s2" x="7" y="4" width="18" height="24" />
+    {[0, 1, 2].map((i) => (<g><rect class="b" x="9" y={6 + i * 7} width="14" height="5" /><rect class="led" style={`animation-delay:-${i * 0.4}s`} x="11" y={8 + i * 7} width="2" height="2" /><rect class="ls" x="15" y={8 + i * 7} width="6" height="1" /></g>))}
+  </svg>
+)}
+{name === 'i-data' && (
+  <svg class="px" viewBox="0 0 32 32" aria-hidden="true">
+    <rect class="feed m" x="1" y="8" width="9" height="3" /><rect class="feed sb" style="animation-delay:.5s" x="1" y="14" width="9" height="3" /><rect class="feed m" style="animation-delay:1s" x="1" y="20" width="9" height="3" />
+    <rect class="s2" x="14" y="7" width="16" height="21" />
+    <rect class="rise a" x="15" y="13" width="14" height="14" />
+    <rect class="ls" x="16" y="4" width="12" height="1" /><rect class="ls" x="14" y="5" width="2" height="2" /><rect class="ls" x="28" y="5" width="2" height="2" /><rect class="ls" x="16" y="7" width="12" height="1" />
+    <rect class="ls" x="14" y="7" width="1" height="21" /><rect class="ls" x="29" y="7" width="1" height="21" /><rect class="ls" x="16" y="28" width="12" height="1" />
+    <rect class="ls" x="15" y="15" width="14" height="1" /><rect class="ls" x="15" y="21" width="14" height="1" />
+  </svg>
+)}
+{name === 'i-ai' && (
+  <svg class="px" viewBox="0 0 32 32" aria-hidden="true">
+    <g class="wire"><line x1="5" y1="8" x2="16" y2="6" /><line x1="5" y1="8" x2="16" y2="16" /><line x1="5" y1="8" x2="16" y2="26" /><line x1="5" y1="24" x2="16" y2="6" /><line x1="5" y1="24" x2="16" y2="16" /><line x1="5" y1="24" x2="16" y2="26" /><line x1="16" y1="6" x2="27" y2="16" /><line x1="16" y1="16" x2="27" y2="16" /><line x1="16" y1="26" x2="27" y2="16" /></g>
+    <rect class="ls" x="2" y="5" width="6" height="6" /><rect class="ls" x="2" y="21" width="6" height="6" />
+    <rect class="boot" x="13" y="3" width="6" height="6" /><rect class="boot" style="animation-delay:.4s" x="13" y="13" width="6" height="6" /><rect class="boot" style="animation-delay:.8s" x="13" y="23" width="6" height="6" />
+    <rect class="a" x="24" y="13" width="6" height="6" />
+    <rect class="a" x="-1" y="-1" width="2" height="2"><animateMotion dur="1.6s" repeatCount="indefinite" path="M5 8 L16 16 L27 16" /></rect>
+    <rect class="i" x="-1" y="-1" width="2" height="2"><animateMotion dur="1.6s" begin="-.8s" repeatCount="indefinite" path="M5 24 L16 6 L27 16" /></rect>
+  </svg>
+)}
+
+{name === 'i-agile' && (
+  <svg class="px" viewBox="0 0 32 32" aria-hidden="true">
+    {[0, 1, 2].map((c) => <><rect class="ls" x={2 + c * 10} y="4" width="8" height="24" /><rect class="s2" x={3 + c * 10} y="5" width="6" height="22" /><rect class={c === 2 ? 'a' : 'm'} x={4 + c * 10} y="7" width="4" height="1" /></>)}
+    <rect class="slide-agile a" x="4" y="11" width="4" height="5" />
+  </svg>
+)}
+
+{name === 'i-distributed' && (
+  <svg class="px" viewBox="0 0 32 32" aria-hidden="true">
+    <g class="wire"><line x1="16" y1="6" x2="5" y2="26" /><line x1="16" y1="6" x2="27" y2="26" /><line x1="5" y1="26" x2="27" y2="26" /></g>
+    <rect class="ls" x="12" y="2" width="8" height="8" /><rect class="ls" x="1" y="22" width="8" height="8" /><rect class="ls" x="23" y="22" width="8" height="8" />
+    <rect class="a" x="-2" y="-2" width="4" height="4"><animateMotion dur="2s" repeatCount="indefinite" path="M16 6 L27 26 L5 26 Z" /></rect>
+  </svg>
+)}
+{name === 'i-cloud' && (
+  <svg class="px" viewBox="0 0 32 32" aria-hidden="true">
+    <g><rect class="ls" x="5" y="6" width="22" height="9" /><rect class="ls" x="9" y="2" width="9" height="5" /><rect class="ls" x="16" y="4" width="7" height="3" />
+      <rect class="s2" x="6" y="7" width="20" height="7" /><rect class="s2" x="10" y="3" width="7" height="4" /><rect class="s2" x="17" y="5" width="5" height="2" /></g>
+    <rect class="a" x="13" y="9" width="6" height="3" />
+    <path class="wire" d="M6 24 C 6 18, 13 18, 16 24 C 19 30, 26 30, 26 24 C 26 18, 19 18, 16 24 C 13 30, 6 30, 6 24 Z" />
+    <rect class="a" x="-1.5" y="-1.5" width="3" height="3"><animateMotion dur="2.66s" repeatCount="indefinite" path="M6 24 C 6 18, 13 18, 16 24 C 19 30, 26 30, 26 24 C 26 18, 19 18, 16 24 C 13 30, 6 30, 6 24 Z" /></rect>
+  </svg>
+)}
+{name === 'i-product' && (
+  <svg class="px" viewBox="0 0 32 32" aria-hidden="true">
+    <rect class="ls" x="2" y="4" width="28" height="22" /><rect class="s" x="3" y="5" width="26" height="20" /><rect class="s2" x="3" y="5" width="26" height="4" />
+    <rect class="m" x="6" y="12" width="14" height="2" /><rect class="click" x="6" y="17" width="10" height="4" />
+    <g class="cursor-bob"><rect class="i" x="18" y="19" width="1" height="6" /><rect class="i" x="19" y="20" width="1" height="4" /><rect class="i" x="20" y="21" width="1" height="2" /></g>
+  </svg>
+)}
+{name === 'i-quality' && (
+  <svg class="px" viewBox="0 0 32 32" aria-hidden="true">
+    {[0, 1, 2].map((i) => (<g><rect class="ls" x="3" y={4 + i * 9} width="7" height="7" /><g class="pop" style={`animation-delay:${i * 0.4}s`}><rect class="a" x="4" y={7 + i * 9} width="2" height="2" /><rect class="a" x="6" y={8 + i * 9} width="2" height="2" /><rect class="a" x="8" y={5 + i * 9} width="2" height="3" /></g><rect class="m" x="13" y={6 + i * 9} width={15 - i * 2} height="2" /></g>))}
+  </svg>
+)}
+
+<style is:global>
+  .rr-up { animation: rrup 4s ease-in-out infinite; transform-box: fill-box; }
+  @keyframes rrup { 0%, 30% { transform: translateY(0); } 50%, 90% { transform: translateY(-26px); } 100% { transform: translateY(0); } }
+  .rr-down { animation: rrdown 4s ease-in-out infinite; transform-box: fill-box; }
+  @keyframes rrdown { 0%, 30% { transform: translateY(0); } 50%, 90% { transform: translateY(13px); } 100% { transform: translateY(0); } }
+  .pose-a { animation: posea .9s steps(1) infinite; }
+  .pose-b { animation: poseb .9s steps(1) infinite; }
+  @keyframes posea { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+  @keyframes poseb { 0%, 49% { opacity: 0; } 50%, 100% { opacity: 1; } }
+  .feed { animation: feed 1.5s ease-in infinite; transform-box: fill-box; }
+  @keyframes feed { 0% { transform: translateX(0); opacity: 1; } 70% { transform: translateX(5px); opacity: 1; } 100% { transform: translateX(6px); opacity: 0; } }
+  .tagflip { animation: tagflip 4s steps(1) infinite; }
+  @keyframes tagflip { 0%, 4% { opacity: 0; } 5%, 74% { opacity: 1; } 75%, 100% { opacity: 0; } }
+  .typeline { animation: typeline 4s steps(6) infinite; transform-box: fill-box; transform-origin: 0 50%; }
+  @keyframes typeline { 0% { transform: scaleX(0); } 30%, 90% { transform: scaleX(1); } 100% { transform: scaleX(0); } }
+  .file { animation: file 4s ease-in-out infinite; transform-box: fill-box; }
+  @keyframes file { 0%, 45% { transform: translate(-48px, 6px); opacity: 0; } 55% { opacity: 1; } 75%, 92% { transform: translate(0, 0); opacity: 1; } 100% { transform: translate(0, 0); opacity: 0; } }
+  .orbit { animation: orbit 2.66s steps(12) infinite; transform-box: view-box; transform-origin: 17px 30px; }
+  @keyframes orbit { to { transform: rotate(360deg); } }
+  .slide-agile { animation: slideag 3s ease-in-out infinite; transform-box: fill-box; }
+  @keyframes slideag { 0%, 20% { transform: translateX(0); } 40%, 60% { transform: translateX(10px); } 80%, 100% { transform: translateX(20px); } }
+  .slide18 { animation: slide18 4.5s ease-in-out infinite; transform-box: fill-box; }
+  @keyframes slide18 { 0%, 18% { transform: translateX(0); } 33%, 52% { transform: translateX(18px); } 67%, 90% { transform: translateX(36px); } 100% { transform: translateX(36px); opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) { .pose-b { opacity: 0; } .tagflip, .file { opacity: 1; } }
+</style>

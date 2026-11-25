@@ -1,0 +1,28 @@
+---
+import { t, type Lang } from '../i18n/ui';
+import { localized } from '../data/site';
+import Icon from './Icon.astro';
+interface Props { lang: Lang; path: string }
+const { lang, path } = Astro.props;
+const other: Lang = lang === 'en' ? 'es' : 'en';
+const home = localized(lang);
+---
+<header class="site">
+  <div class="wrap">
+    <a class="logo" href={home} aria-label={t('homeLabel', lang)}>JCMB<span class="blk" aria-hidden="true"></span></a>
+    <span class="now" aria-hidden="true">jcmb@icesi:<b id="now-path">~</b>$</span>
+    <nav class="main" aria-label="Main">
+      <a href={`${home}#about`}>{t('navAbout', lang)}</a>
+      <a href={`${home}#work`}>{t('navWork', lang)}</a>
+      <a href={`${home}#skills`}>{t('navSkills', lang)}</a>
+      <a href={`${home}#contact`}>{t('navContact', lang)}</a>
+    </nav>
+    <div class="tgls">
+      <a class="tgl" href={localized(other, path)} hreflang={other} lang={other} data-lang-link={other} aria-label={t('langSwitch', lang)}>{other.toUpperCase()}</a>
+      <button class="tgl tgl-icon" id="theme-btn" type="button" aria-label={t('toLight', lang)} data-to-light={t('toLight', lang)} data-to-dark={t('toDark', lang)} title={t('toLight', lang)}>
+        <span class="i-sun"><Icon name="sun" size={18} /></span><span class="i-moon"><Icon name="moon" size={18} /></span>
+      </button>
+    </div>
+    <a class="btn btn-primary btn-sm" href={localized(lang, 'cv/')}>{t('cv', lang)}</a>
+  </div>
+</header>

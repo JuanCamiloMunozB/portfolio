@@ -1,0 +1,230 @@
+---
+import '@fontsource/atkinson-hyperlegible/latin-400.css';
+import '@fontsource/atkinson-hyperlegible/latin-700.css';
+import '@fontsource/atkinson-hyperlegible/latin-ext-400.css';
+import '@fontsource/jersey-10/latin-400.css';
+import '@fontsource/jersey-10/latin-ext-400.css';
+import '@fontsource/jetbrains-mono/latin-400.css';
+import '@fontsource/jetbrains-mono/latin-600.css';
+import '@fontsource/silkscreen/latin-400.css';
+import '../styles/global.css';
+import jerseyUrl from '@fontsource/jersey-10/files/jersey-10-latin-400-normal.woff2?url';
+import atkinson400Url from '@fontsource/atkinson-hyperlegible/files/atkinson-hyperlegible-latin-400-normal.woff2?url';
+import atkinson700Url from '@fontsource/atkinson-hyperlegible/files/atkinson-hyperlegible-latin-700-normal.woff2?url';
+import monoUrl from '@fontsource/jetbrains-mono/files/jetbrains-mono-latin-400-normal.woff2?url';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import ContactDock from '../components/ContactDock.astro';
+import { t, type Lang } from '../i18n/ui';
+import { SITE, localized, url, cvFileName } from '../data/site';
+
+interface Props { lang: Lang; path?: string; title?: string; description?: string; noindex?: boolean }
+const { lang, path = '', title, description, noindex } = Astro.props;
+const fullTitle = title ? `${title} | ${SITE.shortName}` : `${SITE.shortName} | Software Engineering`;
+const desc = description ?? t('metaDescription', lang);
+const abs = (l: Lang) => new URL(localized(l, path), Astro.site).href;
+const ld = {
+  '@context': 'https://schema.org', '@type': 'Person', name: SITE.name, url: abs('en'),
+  sameAs: [SITE.github, SITE.linkedin], alumniOf: { '@type': 'CollegeOrUniversity', name: 'Universidad Icesi' },
+};
+---
+<!doctype html>
+<html lang={lang} data-theme="dark" data-palette="linkedin">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{fullTitle}</title>
+  <link rel="preload" href={jerseyUrl} as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href={atkinson400Url} as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href={atkinson700Url} as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href={monoUrl} as="font" type="font/woff2" crossorigin />
+  <meta name="description" content={desc} />
+  {noindex && <meta name="robots" content="noindex" />}
+  <link rel="canonical" href={abs(lang)} />
+  <link rel="alternate" hreflang="en" href={abs('en')} />
+  <link rel="alternate" hreflang="es" href={abs('es')} />
+  <link rel="alternate" hreflang="x-default" href={abs('en')} />
+  <link rel="icon" href={url('favicon.svg?v=4')} type="image/svg+xml" />
+  <link rel="icon" href={url('favicon-32.png?v=4')} type="image/png" sizes="32x32" />
+  <link rel="apple-touch-icon" href={url('apple-touch-icon.png?v=4')} />
+  <meta property="og:title" content={fullTitle} />
+  <meta property="og:description" content={desc} />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content={abs(lang)} />
+  <meta property="og:locale" content={lang === 'es' ? 'es_CO' : 'en_US'} />
+  <meta name="theme-color" content="#1b1b1b" />
+  <script type="application/ld+json" set:html={JSON.stringify(ld)} />
+  <script is:inline>
+    // Apply the saved theme before paint; dark is the default.
+    (function () {
+      var d = document.documentElement; d.classList.add('js');
+      try { var s = localStorage.getItem('theme'); if (s === 'light' || s === 'dark') d.dataset.theme = s; } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+  <div id="progress" aria-hidden="true"></div>
+  <a class="skip" href="#main">{t('skip', lang)}</a>
+  <Header lang={lang} path={path} />
+  <ContactDock lang={lang} />
+  <main id="main"><slot /></main>
+  <Footer lang={lang} />
+  <div class="dl-toast" id="dl-toast" role="status" aria-live="polite" hidden
+    data-start={t('dlStart', lang)} data-done={t('dlDone', lang)} data-fallback={t('dlFallback', lang)} data-busy={t('dlBusy', lang)}
+    data-file-en={cvFileName('en')} data-file-es={cvFileName('es')}>
+    <div class="dl-cmd"><span class="dl-usr">jcmb@icesi</span>:~$ wget <span id="dl-file"></span></div>
+    <div class="dl-bar"><span id="dl-ascii">[....................]</span> <b id="dl-pct"></b></div>
+    <div class="dl-msg" id="dl-msg"></div>
+  </div>
+  <script>
+    import Lenis from 'lenis';
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Smooth, weighted scrolling like the reference site (off for reduced motion)
+    if (!reduce) new Lenis({ lerp: 0.1, autoRaf: true, anchors: { offset: -72 } });
+
+    // One thing at a time, seamlessly: each section's brightness follows how much of the
+    // middle of the screen it fills, updated every frame while scrolling.
+    const nowPath = document.getElementById('now-path');
+    const focusables = [...document.querySelectorAll<HTMLElement>('[data-focus]')];
+    if (focusables.length) {
+      document.documentElement.classList.add('focus-mode');
+      let queued = false;
+      const update = () => {
+        queued = false;
+        const vh = innerHeight, top = vh * 0.3, bottom = vh * 0.7;
+        let best: HTMLElement | null = null, bestOverlap = 0;
+        for (const el of focusables) {
+          const r = el.getBoundingClientRect();
+          const overlap = Math.max(0, Math.min(r.bottom, bottom) - Math.max(r.top, top)) / (bottom - top);
+          el.style.setProperty('--f', Math.min(1, overlap * 1.5).toFixed(3));
+          if (overlap > bestOverlap) { bestOverlap = overlap; best = el; }
+        }
+        if (best && nowPath && best.dataset.prompt) nowPath.textContent = best.dataset.prompt;
+      };
+      const request = () => { if (!queued) { queued = true; requestAnimationFrame(update); } };
+      addEventListener('scroll', request, { passive: true }); addEventListener('resize', request); update();
+    }
+
+    // Prompts type their command once, when they enter the screen
+    const pio = new IntersectionObserver((entries) => entries.forEach((x) => {
+      if (x.isIntersecting) { x.target.classList.add('typed'); pio.unobserve(x.target); }
+    }), { threshold: 0.6 });
+    document.querySelectorAll('.prompt').forEach((el) => pio.observe(el));
+
+    // Theme toggle: the icon shows the theme you switch to (sun in dark, moon in light)
+    const btn = document.getElementById('theme-btn');
+    const sync = () => {
+      const light = document.documentElement.dataset.theme === 'light';
+      if (btn) { const label = light ? btn.dataset.toDark! : btn.dataset.toLight!; btn.setAttribute('aria-label', label); btn.title = label; }
+    };
+    sync();
+    btn?.addEventListener('click', () => {
+      const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+      document.documentElement.dataset.theme = next;
+      try { localStorage.setItem('theme', next); } catch {}
+      sync();
+    });
+
+    // Remember the language the visitor picked (no automatic redirects)
+    document.querySelectorAll<HTMLAnchorElement>('[data-lang-link]').forEach((a) =>
+      a.addEventListener('click', () => { try { localStorage.setItem('lang', a.dataset.langLink!); } catch {} }));
+
+    // Scroll progress
+    const bar = document.getElementById('progress');
+    const onScroll = () => {
+      const h = document.documentElement;
+      const max = h.scrollHeight - h.clientHeight;
+      if (bar) bar.style.transform = `scaleX(${max > 0 ? h.scrollTop / max : 0})`;
+    };
+    addEventListener('scroll', onScroll, { passive: true }); onScroll();
+
+    // Reduced motion: freeze SMIL scenes on a readable frame
+    if (reduce) document.querySelectorAll('svg').forEach((s) => { if ('pauseAnimations' in s) { s.setCurrentTime(2.6); s.pauseAnimations(); } });
+
+    // Count-up numbers, typed headings, card reveal
+    const lang = document.documentElement.lang === 'es' ? 'es-CO' : 'en-US';
+    function countUp(el: HTMLElement) {
+      const target = parseFloat(el.dataset.count!);
+      const dec = +(el.dataset.dec ?? 0);
+      const suf = el.dataset.suffix ?? '';
+      const fmt = (v: number) => new Intl.NumberFormat(lang, { minimumFractionDigits: dec, maximumFractionDigits: dec }).format(v) + suf;
+      if (reduce) { el.textContent = fmt(target); return; }
+      const t0 = performance.now(), D = 1100;
+      const step = (now: number) => {
+        const p = Math.min(1, (now - t0) / D), e = 1 - Math.pow(1 - p, 3);
+        el.textContent = fmt(target * e);
+        if (p < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    }
+    const io = new IntersectionObserver((entries) => entries.forEach((x) => {
+      if (!x.isIntersecting) return;
+      const el = x.target as HTMLElement; io.unobserve(el);
+      if (el.dataset.count) countUp(el);
+      else if (el.matches('h2.type')) el.classList.add('go');
+      else el.classList.add('in');
+    }), { threshold: 0.2 });
+    const tileIO = new IntersectionObserver((entries) => entries.forEach((x) => {
+      if (!x.isIntersecting) return; tileIO.unobserve(x.target);
+      x.target.querySelectorAll<HTMLElement>('[data-tile]').forEach((tile, i) => { tile.style.transitionDelay = `${i * 25}ms`; tile.classList.add('in'); });
+    }), { threshold: 0.15 });
+    document.querySelectorAll('.skill').forEach((el) => tileIO.observe(el));
+    document.querySelectorAll<HTMLElement>('[data-count], h2.type, .reveal, .neofetch').forEach((el, i) => {
+      if (el.classList.contains('reveal')) el.style.transitionDelay = `${(i % 3) * 80}ms`;
+      io.observe(el);
+    });
+
+    // CV downloads with visible progress. Google's export allows cross-origin fetches, so the
+    // page downloads the PDF itself, shows progress and saves it with a clean name. If the fetch
+    // fails for any reason, the browser downloads it the normal way.
+    const toast = document.getElementById('dl-toast') as HTMLElement | null;
+    let hideTimer = 0;
+    const asciiBar = (frac: number) => { const n = Math.round(frac * 20); return '[' + '#'.repeat(n) + '.'.repeat(20 - n) + ']'; };
+    document.querySelectorAll<HTMLAnchorElement>('a[data-cv]').forEach((a) => a.addEventListener('click', async (ev) => {
+      if (!toast || !('fetch' in window) || a.getAttribute('aria-busy') === 'true') return;
+      ev.preventDefault();
+      const lang = a.dataset.cv as 'en' | 'es';
+      const file = toast.dataset[lang === 'es' ? 'fileEs' : 'fileEn']!;
+      const $ = (id: string) => document.getElementById(id)!;
+      clearTimeout(hideTimer); toast.hidden = false; toast.classList.remove('done', 'failed');
+      $('dl-file').textContent = file; $('dl-ascii').textContent = asciiBar(0); $('dl-pct').textContent = ''; $('dl-msg').textContent = toast.dataset.start!;
+      const label = a.querySelector('.lbl-text') ?? a; const original = label.textContent;
+      a.setAttribute('aria-busy', 'true'); a.classList.add('is-busy'); label.textContent = a.dataset.busy ?? toast.dataset.busy!;
+      let fake = 0; const spin = setInterval(() => { fake = Math.min(0.9, fake + 0.06); if (!toast.classList.contains('has-total')) $('dl-ascii').textContent = asciiBar(fake); }, 120);
+      try {
+        const res = await fetch(a.href);
+        if (!res.ok || !res.body) throw new Error(String(res.status));
+        const total = +(res.headers.get('content-length') ?? 0);
+        toast.classList.toggle('has-total', total > 0);
+        const reader = res.body.getReader(); const chunks: Uint8Array[] = []; let got = 0;
+        for (;;) {
+          const { done, value } = await reader.read(); if (done) break;
+          chunks.push(value); got += value.length;
+          if (total) { $('dl-ascii').textContent = asciiBar(got / total); $('dl-pct').textContent = `${Math.round((got / total) * 100)}%`; }
+          else $('dl-pct').textContent = `${Math.round(got / 1024)} KB`;
+        }
+        clearInterval(spin);
+        const blob = new Blob(chunks as BlobPart[], { type: 'application/pdf' });
+        const href = URL.createObjectURL(blob); const tmp = document.createElement('a');
+        tmp.href = href; tmp.download = file; document.body.appendChild(tmp); tmp.click(); tmp.remove();
+        setTimeout(() => URL.revokeObjectURL(href), 10000);
+        $('dl-ascii').textContent = asciiBar(1); $('dl-pct').textContent = `${Math.round(got / 1024)} KB`;
+        $('dl-msg').textContent = `[  OK  ] ${toast.dataset.done}: ${file}`; toast.classList.add('done');
+      } catch {
+        clearInterval(spin);
+        $('dl-msg').textContent = `[ INFO ] ${toast.dataset.fallback}`; toast.classList.add('failed');
+        window.location.href = a.href;
+      } finally {
+        label.textContent = original; a.removeAttribute('aria-busy'); a.classList.remove('is-busy');
+        hideTimer = window.setTimeout(() => { toast.hidden = true; }, 4500);
+      }
+    }));
+
+    // Copy email
+    document.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach((b) => b.addEventListener('click', async () => {
+      try { await navigator.clipboard.writeText(b.dataset.copy!); b.textContent = b.dataset.done!; } catch {}
+    }));
+  </script>
+</body>
+</html>

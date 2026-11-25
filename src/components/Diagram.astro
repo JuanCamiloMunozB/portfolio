@@ -1,0 +1,112 @@
+---
+/**
+ * UML deployment + component diagram, drawn with Visual Paradigm's conventions:
+ * - node (3D box): hardware or an execution environment (device, cloud, cluster, server); nodes can nest
+ * - component (box with the component icon): software that runs on a node
+ * - artifact (box with a page icon): a deployable or stored thing
+ * - path: communication path between nodes, solid line, labeled with the protocol
+ * - dep: dependency, dashed line with an open arrow; event: the same in amber for asynchronous messages
+ * - assembly: required interface (socket) meeting a provided interface (ball)
+ * The build fails if a label would overflow its box.
+ */
+import type { CaseStudy, DNode } from '../data/projects';
+import { tx, type Lang } from '../i18n/ui';
+interface Props { diagram: CaseStudy['diagram']; lang: Lang; title: string }
+const { diagram, lang, title } = Astro.props;
+const label = (l: string | { en: string; es: string }) => (typeof l === 'string' ? l : tx(l, lang));
+const id = `dg-${title.toLowerCase().normalize('NFD').replace(/[^a-z0-9]+/g, '-')}`;
+const W = diagram.w ?? 720;
+const D = 10; // node depth
+
+// JetBrains Mono advance is 0.6em: 7.8px at 13px, 6.6px at 11px.
+const NAME = 7.8, STEREO = 6.6, PAD = 12, ICON = 22;
+for (const n of diagram.nodes) {
+  const w = n.w ?? 140;
+  const icon = n.kind === 'node' ? D : ICON;
+  const need = Math.max(label(n.name).length * NAME, (n.stereo ? n.stereo.length + 2 : 0) * STEREO) + PAD * 2 + icon;
+  if (w < need) throw new Error(`Diagram "${title}" (${lang}): "${label(n.name)}" needs ${Math.ceil(need)}px, has ${w}px`);
+  if (n.x + w > W) throw new Error(`Diagram "${title}": "${label(n.name)}" overflows the ${W}px canvas`);
+}
+const H = (n: DNode) => n.h ?? 52;
+const pathEdges = diagram.edges.filter((e) => (e.kind ?? 'dep') !== 'assembly');
+const packets = diagram.edges.filter((e) => e.arrow !== false && (e.kind === 'path' || (e.kind ?? 'dep') === 'dep'));
+---
+<figure class="diagram">
+  <svg viewBox={`0 0 ${W} ${diagram.h}`} role="img" aria-labelledby={`${id}-t ${id}-d`}>
+    <title id={`${id}-t`}>{title}</title>
+    <desc id={`${id}-d`}>{tx(diagram.desc, lang)}</desc>
+    <defs>
+      <marker id={`${id}-ar`} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M1 1 L9 5 L1 9" fill="none" stroke="var(--ink)" stroke-width="1.6" /></marker>
+      <marker id={`${id}-aa`} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M1 1 L9 5 L1 9" fill="none" stroke="var(--accent)" stroke-width="1.6" /></marker>
+    </defs>
+
+    {diagram.nodes.filter((n) => n.kind === 'node').map((n) => {
+      const w = n.w ?? 140, h = H(n), x = n.x, y = n.y;
+      return (
+        <g class="u-node">
+          <path class="top" d={`M${x} ${y + D} L${x + D} ${y} H${x + w} L${x + w - D} ${y + D} Z`} />
+          <path class="side" d={`M${x + w - D} ${y + D} L${x + w} ${y} V${y + h - D} L${x + w - D} ${y + h} Z`} />
+          <rect class="front" x={x} y={y + D} width={w - D} height={h - D} />
+          {n.stereo && <text class="stereo" x={x + PAD} y={y + D + 18}>{`«${n.stereo}»`}</text>}
+          <text class="name" x={x + PAD} y={y + D + 35}>{label(n.name)}</text>
+        </g>
+      );
+    })}
+
+    {pathEdges.map((e) => {
+      const kind = e.kind ?? 'dep';
+      return (
+        <g>
+          <path class={`u-edge ${kind}`} d={e.d} marker-end={kind === 'path' || e.arrow === false ? undefined : `url(#${id}-${kind === 'event' ? 'aa' : 'ar'})`} />
+          {e.label && <text class={`u-elabel ${kind}`} x={e.lx} y={e.ly}>{`«${e.label}»`}</text>}
+        </g>
+      );
+    })}
+
+    {diagram.edges.filter((e) => e.kind === 'assembly').map((e) => {
+      const [rx, ry] = e.req!, [px, py] = e.prov!, [bx, by] = e.at!;
+      // the socket opens toward the requiring side
+      const ang = Math.atan2(ry - by, rx - bx), r = 10;
+      const a1 = ang - Math.PI / 2, a2 = ang + Math.PI / 2;
+      const sx1 = bx + r * Math.cos(a1), sy1 = by + r * Math.sin(a1), sx2 = bx + r * Math.cos(a2), sy2 = by + r * Math.sin(a2);
+      const ex = bx + r * Math.cos(ang), ey = by + r * Math.sin(ang);
+      return (
+        <g class="u-assembly">
+          <line x1={rx} y1={ry} x2={ex} y2={ey} />
+          <path class="socket" d={`M${sx1} ${sy1} A${r} ${r} 0 0 1 ${sx2} ${sy2}`} />
+          <line x1={px} y1={py} x2={bx} y2={by} />
+          <circle class="ball" cx={bx} cy={by} r="6" />
+          {e.label && <text class="u-elabel" x={e.lx} y={e.ly}>{e.label}</text>}
+        </g>
+      );
+    })}
+
+    {diagram.nodes.filter((n) => n.kind !== 'node').map((n) => {
+      const w = n.w ?? 140, h = H(n), x = n.x, y = n.y;
+      return (
+        <g class={`u-comp${n.hot ? ' hot' : ''}${n.kind === 'artifact' ? ' artifact' : ''}`}>
+          <rect class="box" x={x} y={y} width={w} height={h} />
+          {n.kind === 'artifact'
+            ? <path class="icon" d={`M${x + w - 20} ${y + 7} H${x + w - 12} L${x + w - 8} ${y + 11} V${y + 23} H${x + w - 20} Z M${x + w - 12} ${y + 7} V${y + 11} H${x + w - 8}`} />
+            : <g class="icon"><rect x={x + w - 20} y={y + 7} width="12" height="15" /><rect x={x + w - 23} y={y + 10} width="6" height="3" /><rect x={x + w - 23} y={y + 16} width="6" height="3" /></g>}
+          {n.stereo && <text class="stereo" x={x + PAD} y={y + 20}>{`«${n.stereo}»`}</text>}
+          <text class="name" x={x + PAD} y={y + 38}>{label(n.name)}</text>
+        </g>
+      );
+    })}
+
+    {packets.map((e, i) => (
+      <rect class="u-packet" x="-3.5" y="-3.5" width="7" height="7">
+        <animateMotion dur="2.6s" begin={`-${(i * 0.5) % 2.6}s`} repeatCount="indefinite" path={e.d} />
+      </rect>
+    ))}
+  </svg>
+  <figcaption>{tx(diagram.caption, lang)}</figcaption>
+  <ul class="u-legend" aria-hidden="true">
+    <li><svg viewBox="0 0 28 18"><path class="top" d="M2 6 L6 2 H26 L22 6 Z" /><path class="side" d="M22 6 L26 2 V12 L22 16 Z" /><rect class="front" x="2" y="6" width="20" height="10" /></svg>{lang === 'es' ? 'nodo' : 'node'}</li>
+    <li><svg viewBox="0 0 28 18"><rect class="box" x="2" y="2" width="24" height="14" /><rect class="ico" x="16" y="5" width="6" height="8" /><rect class="ico" x="14" y="6" width="4" height="2" /><rect class="ico" x="14" y="10" width="4" height="2" /></svg>{lang === 'es' ? 'componente' : 'component'}</li>
+    <li><svg viewBox="0 0 28 18"><line class="path" x1="2" y1="9" x2="26" y2="9" /></svg>{lang === 'es' ? 'ruta de comunicación' : 'communication path'}</li>
+    <li><svg viewBox="0 0 28 18"><line class="dep" x1="2" y1="9" x2="24" y2="9" /><path class="dep" d="M19 5 L25 9 L19 13" /></svg>{lang === 'es' ? 'dependencia' : 'dependency'}</li>
+    <li><svg viewBox="0 0 28 18"><line class="event" x1="2" y1="9" x2="24" y2="9" /><path class="event" d="M19 5 L25 9 L19 13" /></svg>{lang === 'es' ? 'evento' : 'event'}</li>
+  </ul>
+</figure>

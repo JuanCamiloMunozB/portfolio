@@ -1,0 +1,21 @@
+---
+import Base from '../layouts/Base.astro';
+import { t } from '../i18n/ui';
+import { SITE, localized, url } from '../data/site';
+---
+<Base lang="en" title="404" noindex>
+  <section class="contact">
+    <div class="wrap">
+      <div class="route">GET {'/???'} 404 Not Found</div>
+      <h2 class="type"><span class="t">{t('notFoundTitle', 'en')}</span></h2>
+      <p>{t('notFoundText', 'en')}</p>
+      <p lang="es">{t('notFoundText', 'es')}</p>
+      <div class="ctas">
+        <a class="btn btn-primary" href={localized('en')}>{t('goHome', 'en')}</a>
+        <a class="btn btn-ghost" href={localized('es')} lang="es">{t('goHome', 'es')}</a>
+        <a class="textlink" href={SITE.cv.en} data-cv="en">CV English</a>
+        <a class="textlink" href={SITE.cv.es} data-cv="es">CV Español</a>
+      </div>
+    </div>
+  </section>
+</Base>

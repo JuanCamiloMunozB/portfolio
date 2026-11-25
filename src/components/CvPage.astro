@@ -1,0 +1,53 @@
+---
+/** The CV, readable in the page: Google's live preview of the Doc, so it is always the latest version. */
+import Base from '../layouts/Base.astro';
+import Prompt from './Prompt.astro';
+import Icon from './Icon.astro';
+import { t, type Lang } from '../i18n/ui';
+import { cvPdf, cvPreview, SITE } from '../data/site';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const langs: Lang[] = lang === 'es' ? ['es', 'en'] : ['en', 'es'];
+const names: Record<Lang, string> = { en: 'English', es: 'Español' };
+---
+<Base lang={lang} path="cv/" title={t('cvTitle', lang)} description={t('cvLead', lang)}>
+  <section class="cv-page">
+    <div class="wrap">
+      <Prompt cmd="less cv.pdf" />
+      <h1>{t('cvTitle', lang)}</h1>
+      <p class="lead">{t('cvLead', lang)}</p>
+      <div class="cv-bar">
+        <div class="cv-tabs" role="tablist" aria-label={t('cvTitle', lang)}>
+          {langs.map((l, i) => (
+            <button type="button" role="tab" aria-selected={i === 0 ? 'true' : 'false'} data-lang={l} data-preview={cvPreview(l)} data-pdf={cvPdf(l)} data-docs={`https://docs.google.com/document/d/${SITE.cvDoc[l]}/view`}>{names[l]}</button>
+          ))}
+        </div>
+        <a class="btn btn-primary" id="cv-dl" href={cvPdf(langs[0])} data-cv={langs[0]}><Icon name="download" /><span class="lbl-text">{t('downloadCv', lang)}</span></a>
+        <a class="btn btn-ghost cv-docs" id="cv-docs" href={`https://docs.google.com/document/d/${SITE.cvDoc[langs[0]]}/view`} rel="noopener"><Icon name="drive" />{t('cvOpenDocs', lang)}</a>
+      </div>
+      <div class="cv-frame" id="cv-frame">
+        <div class="cv-loading" aria-hidden="true"><span class="spin-bar" id="cv-spin">[####................]</span><span>{t('cvLoading', lang)}</span></div>
+        <iframe id="cv-iframe" src={cvPreview(langs[0])} title={`${t('cvTitle', lang)}, ${names[langs[0]]}`} loading="lazy"></iframe>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  const frame = document.getElementById('cv-frame')!;
+  const iframe = document.getElementById('cv-iframe') as HTMLIFrameElement;
+  const dl = document.getElementById('cv-dl') as HTMLAnchorElement;
+  const docs = document.getElementById('cv-docs') as HTMLAnchorElement;
+  const spinEl = document.getElementById('cv-spin')!;
+  let k = 0;
+  const spin = setInterval(() => { k = (k + 1) % 17; spinEl.textContent = '[' + '.'.repeat(k) + '####' + '.'.repeat(16 - k) + ']'; }, 90);
+  iframe.addEventListener('load', () => { frame.classList.add('loaded'); });
+  document.querySelectorAll<HTMLButtonElement>('.cv-tabs button').forEach((b) => b.addEventListener('click', () => {
+    if (b.getAttribute('aria-selected') === 'true') return;
+    document.querySelectorAll('.cv-tabs button').forEach((x) => x.setAttribute('aria-selected', String(x === b)));
+    frame.classList.remove('loaded');
+    iframe.src = b.dataset.preview!; iframe.title = `${iframe.title.split(',')[0]}, ${b.textContent}`;
+    dl.href = b.dataset.pdf!; dl.dataset.cv = b.dataset.lang!; docs.href = b.dataset.docs!;
+  }));
+  addEventListener('pagehide', () => clearInterval(spin));
+</script>

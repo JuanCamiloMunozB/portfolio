@@ -1,0 +1,172 @@
+---
+import Base from '../layouts/Base.astro';
+import Scene from './Scene.astro';
+import SystemScene from './SystemScene.astro';
+import SkillArea from './SkillArea.astro';
+import Prompt from './Prompt.astro';
+import Icon from './Icon.astro';
+import Neofetch from './Neofetch.astro';
+import { t, tx, num, type Lang } from '../i18n/ui';
+import { SITE, localized, url } from '../data/site';
+import { projects, featured, more, bonus, type Project } from '../data/projects';
+import { certs } from '../data/certs';
+import { skills } from '../data/skills';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const other: Lang = lang === 'en' ? 'es' : 'en';
+const suffix = (s?: string) => (s === '%' && lang === 'es' ? ' %' : s ?? '');
+const metricText = (p: Project) => p.metric ? num(p.metric.value, lang, p.metric.decimals ?? 0) + suffix(p.metric.suffix) : '';
+const caseHref = (p: Project) => localized(lang, `work/${p.slug}/`);
+const evidenceHref = (slug: string) => {
+  const p = projects.find((x) => x.slug === slug)!;
+  return { href: p.tier === 'featured' ? caseHref(p) : p.repo ?? SITE.github, title: tx(p.title, lang) };
+};
+const mail = `mailto:${SITE.email}?subject=${encodeURIComponent(t('emailSubject', lang))}`;
+---
+<Base lang={lang}>
+  <section class="hero" id="top" data-focus data-prompt="~">
+    <div class="wrap">
+      <div>
+        <Prompt cmd="whoami" />
+        <h1>Juan Camilo<br />Muñoz Barco</h1>
+        <p class="tagline" set:html={t('tagline', lang)} />
+        <div class="avail"><span class="dot" aria-hidden="true"></span><span>{t('available', lang)}</span></div>
+        <div class="ctas hero-cv">
+          <a class="btn btn-primary" href={SITE.cv[lang]} data-cv={lang}><Icon name="download" /><span class="lbl-text">{t('downloadCv', lang)}</span></a>
+          <a class="btn btn-ghost" href={localized(lang, 'cv/')}><Icon name="eye" />{t('viewCv', lang)}</a>
+        </div>
+        <div class="ctas hero-contact">
+          <a class="btn btn-ghost" href={mail}><Icon name="mail" />{t('emailMe', lang)}</a>
+          <a class="btn btn-ghost btn-icon" href={SITE.linkedin} aria-label="LinkedIn" title="LinkedIn"><Icon name="linkedin" /></a>
+          <a class="btn btn-ghost btn-icon" href={SITE.github} aria-label="GitHub" title="GitHub"><Icon name="github" /></a>
+        </div>
+        <ol class="bootlog" aria-label="Status">
+          <li><span class="ok">[  OK  ]</span> {t('bootProjects', lang).replace('{n}', String(featured.length + more.length))}</li>
+          <li><span class="ok">[  OK  ]</span> {t('bootIntern', lang)}</li>
+          <li><span class="run">[ BUSY ]</span> {t('bootBuild', lang)}</li>
+        </ol>
+      </div>
+      <SystemScene lang={lang} />
+    </div>
+  </section>
+
+  <div class="ascii-rule" aria-hidden="true"><span>[ 01 ]</span></div>
+  <section class="block" id="about" aria-labelledby="about-title" data-focus data-prompt="~/about">
+    <div class="wrap">
+      <Prompt cmd="neofetch" />
+      <h2 class="type" id="about-title"><span class="t">{t('aboutTitle', lang)}</span></h2>
+      <div class="about">
+        <Neofetch lang={lang} />
+        <p class="big">{t('aboutText', lang)}</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="ascii-rule" aria-hidden="true"><span>[ 02 ]</span></div>
+  <section class="block" id="work" aria-labelledby="work-title" data-focus data-prompt="~/projects">
+    <div class="wrap">
+      <Prompt cmd="ls ./projects" />
+      <h2 class="type" id="work-title"><span class="t">{t('workTitle', lang)}</span></h2>
+      <div class="cards featured">
+        {featured.map((p) => (
+          <a class="card reveal" href={caseHref(p)}>
+            <div class="art"><Scene name={p.scene} label={tx(p.sceneLabel, lang)} /></div>
+            <div class="body">
+              <h3>{tx(p.title, lang)} <small>{p.inProgress ? <span class="status">{t('inProgress', lang)}</span> : p.year}</small></h3>
+              <p class="cap">{tx(p.caption, lang)}</p>
+              {p.metric && <div class="metric"><b data-count={p.metric.value} data-dec={p.metric.decimals ?? 0} data-suffix={suffix(p.metric.suffix)}>{metricText(p)}</b><span>{tx(p.metric.label, lang)}</span></div>}
+              <div class="tags">{p.tags.slice(0, 4).map((tag) => <span class="tag">{tag}</span>)}</div>
+              <span class="go">{t('readCase', lang)} /&gt;</span>
+            </div>
+          </a>
+        ))}
+      </div>
+
+      <h3 class="sub">{t('moreTitle', lang)}</h3>
+      <div class="cards more">
+        {more.map((p) => (
+          <a class="card reveal" href={p.repo}>
+            <div class="art"><Scene name={p.scene} label={tx(p.sceneLabel, lang)} /></div>
+            <div class="body">
+              <h3>{tx(p.title, lang)} <small>{p.year}</small></h3>
+              <p class="cap">{tx(p.caption, lang)}</p>
+              {p.metric && <div class="metric"><b data-count={p.metric.value} data-dec={p.metric.decimals ?? 0}>{metricText(p)}</b><span>{tx(p.metric.label, lang)}</span></div>}
+              <div class="tags">{p.tags.map((tag) => <span class="tag">{tag}</span>)}</div>
+              <span class="go">{t('repo', lang)} /&gt;</span>
+            </div>
+          </a>
+        ))}
+      </div>
+
+      <h3 class="sub">{t('bonusTitle', lang)}</h3>
+      <div class="minis">
+        {bonus.map((p) => (
+          <a class="mini reveal" href={p.repo}>
+            <div class="art"><Scene name={p.scene} /></div>
+            <b>{tx(p.title, lang)} <small>{p.year}</small></b>
+            <p>{tx(p.caption, lang)}</p>
+            <div class="tags">{p.tags.slice(0, 3).map((tag) => <span class="tag">{tag}</span>)}</div>
+          </a>
+        ))}
+        <div class="mini next reveal">
+          <div class="art"><Scene name="next" /></div>
+          <b>{t('building', lang)}</b>
+          <p>{t('buildingText', lang)}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="ascii-rule" aria-hidden="true"><span>[ 03 ]</span></div>
+  <section class="block" id="skills" aria-labelledby="skills-title" data-focus data-prompt="~/skills">
+    <div class="wrap">
+      <Prompt cmd="cat skills.yml" />
+      <h2 class="type" id="skills-title"><span class="t">{t('skillsTitle', lang)}</span></h2>
+      <div class="skills">
+        {skills.map((s) => <SkillArea area={s} lang={lang} evidence={s.evidence.map(evidenceHref)} />)}
+      </div>
+    </div>
+  </section>
+
+  <div class="ascii-rule" aria-hidden="true"><span>[ 04 ]</span></div>
+  <section class="block" id="certs" aria-labelledby="certs-title" data-focus data-prompt="~/certs">
+    <div class="wrap">
+      <Prompt cmd="ls ./certs" />
+      <h2 class="type" id="certs-title"><span class="t">{t('certsTitle', lang)}</span></h2>
+      <div class="certs">
+        {certs.map((c) => (
+          <a class="cert reveal" href={c.url} rel="noopener">
+            <div class="art"><Scene name={c.scene} label={tx(c.sceneLabel, lang)} /></div>
+            <div class="body"><b>{tx(c.name, lang)}</b><span>{c.issuer}</span><small>{tx(c.date, lang)}</small><span class="verify"><Icon name="eye" size={14} />{t('certsVerify', lang)}</span></div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <div class="ascii-rule" aria-hidden="true"><span>[ 05 ]</span></div>
+  <section class="contact" id="contact" aria-labelledby="contact-title" data-focus data-prompt="~/contact">
+    <div class="wrap">
+      <Prompt cmd="./contact.sh" />
+      <h2 class="type" id="contact-title"><span class="t">{t('contactTitle', lang)}</span></h2>
+      <p>{t('contactText', lang)}</p>
+      <div class="contact-grid">
+        <div class="ctile main">
+          <a class="ctile-link" href={mail}><Icon name="mail" size={32} /><span class="k">Email</span><b>{SITE.email}</b></a>
+          <button class="copy" type="button" data-copy={SITE.email} data-done={t('copied', lang)}><Icon name="copy" size={16} /><span>{t('copyEmail', lang)}</span></button>
+        </div>
+        <a class="ctile" href={SITE.linkedin}><Icon name="linkedin" size={32} /><span class="k">LinkedIn</span><b>in/juancamuba</b></a>
+        <a class="ctile" href={SITE.github}><Icon name="github" size={32} /><span class="k">GitHub</span><b>JuanCamiloMunozB</b></a>
+        <div class="ctile">
+          <Icon name="cv" size={32} /><span class="k">CV (PDF)</span>
+          <div class="chip-row">
+            <a class="chip-btn" href={localized(lang, 'cv/')}><Icon name="eye" size={14} />{lang === 'es' ? 'Ver' : 'View'}</a>
+            <a class="chip-btn" href={SITE.cv.en} hreflang="en" data-cv="en" data-busy="..."><Icon name="download" size={14} /><span class="lbl-text">EN</span></a>
+            <a class="chip-btn" href={SITE.cv.es} hreflang="es" data-cv="es" data-busy="..."><Icon name="download" size={14} /><span class="lbl-text">ES</span></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>

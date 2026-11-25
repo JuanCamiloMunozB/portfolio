@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Portfolio mockup 02</title>
+<!-- Mockup only: Google Fonts here; the real site self-hosts them (all SIL OFL). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&family=Jersey+10&display=swap" rel="stylesheet">
+<style>
+  :root, :root[data-theme="dark"] {
+    --bg:#0e0f11; --surface:#15171a; --surface-2:#1c1f23; --line:#262a2f; --line-strong:#3a3f46;
+    --ink:#ecebe7; --muted:#a2a7ad; --subtle:#878d94;
+    --accent:#f2a33a; --accent-ink:#1a1205; --accent-soft:#2a2012; --ok:#5cc98a; --ok-soft:#14261b;
+  }
+  :root[data-theme="light"] {
+    --bg:#f6f5f1; --surface:#ffffff; --surface-2:#eeece6; --line:#dedbd3; --line-strong:#bdb9af;
+    --ink:#15171a; --muted:#555b62; --subtle:#62676e;
+    --accent:#9c4e00; --accent-ink:#ffffff; --accent-soft:#f6e7d3; --ok:#1d7442; --ok-soft:#e0f0e5;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 400 1.0625rem/1.6 "Atkinson Hyperlegible", system-ui, sans-serif; }
+  a { color: inherit; }
+  :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+  .wrap { max-width: 1160px; margin: 0 auto; padding: 0 16px; }
+  .route { font: 600 .8125rem/1 "JetBrains Mono", monospace; color: var(--accent); letter-spacing: .02em; }
+  .route span { color: var(--subtle); font-weight: 400; }
+  .display { font-family: "Jersey 10", sans-serif; font-weight: 400; }
+  svg.pads { display: block; shape-rendering: crispEdges; }
+  .skip { position: absolute; left: -999px; top: 8px; background: var(--accent); color: var(--accent-ink); padding: 8px 12px; z-index: 10; }
+  .skip:focus { left: 8px; }
+
+  /* Header */
+  header.site { position: sticky; top: 0; z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line); }
+  header.site .wrap { display: flex; align-items: center; gap: 20px; height: 64px; }
+  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .brand b { font: 400 1.5rem/1 "Jersey 10", sans-serif; }
+  nav.main { display: flex; gap: 24px; margin-left: auto; }
+  nav.main a { text-decoration: none; color: var(--muted); }
+  nav.main a:hover { color: var(--ink); }
+  .tgl { background: none; border: 1px solid var(--muted); color: var(--ink); font: 600 .8125rem "JetBrains Mono", monospace; padding: 5px 9px; cursor: pointer; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; font: 700 1rem/1 "Atkinson Hyperlegible", sans-serif; padding: 14px 20px; border: 2px solid var(--accent); cursor: pointer; }
+  .btn-primary { background: var(--accent); color: var(--accent-ink); }
+  .btn-primary:hover { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+  .btn-ghost { background: none; color: var(--ink); border-color: var(--ink); }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-sm { padding: 8px 14px; font-size: .875rem; }
+  @media (max-width: 760px) { nav.main { display: none; } .tgls { margin-left: auto; } .brand b { display: none; } }
+
+  /* Hero */
+  .hero { min-height: calc(100vh - 64px); display: flex; align-items: center; padding: 48px 0; }
+  .hero .wrap { width: 100%; display: grid; grid-template-columns: 1fr auto; gap: 40px; align-items: center; }
+  .hero h1 { font: 400 clamp(4rem, 11vw, 9.5rem)/1 "Jersey 10", sans-serif; margin: 18px 0 28px; letter-spacing: -.01em; }
+  .tagline { font-size: clamp(1.25rem, 2.2vw, 1.625rem); line-height: 1.35; margin: 0 0 10px; max-width: 30ch; }
+  .meta { color: var(--muted); margin: 0 0 28px; }
+  .avail { display: inline-flex; align-items: center; gap: 10px; background: var(--ok-soft); color: var(--ok); padding: 6px 12px; font-weight: 700; font-size: .9375rem; margin-bottom: 28px; }
+  .dot { width: 10px; height: 10px; background: var(--ok); }
+  .ctas { display: flex; flex-wrap: wrap; gap: 12px; }
+  .hero-mark { width: clamp(180px, 26vw, 340px); }
+  @media (max-width: 860px) { .hero .wrap { grid-template-columns: 1fr; } .hero-mark { order: -1; width: 120px; } .hero { min-height: auto; } }
+
+  section.block { padding: 96px 0 0; }
+  h2 { font: 400 clamp(2.5rem, 5.5vw, 4rem)/.95 "Jersey 10", sans-serif; margin: 14px 0 36px; }
+
+  /* Sequencer */
+  .seq { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 32px; align-items: start; }
+  .grid-wrap { background: var(--surface); border: 1px solid var(--line-strong); padding: 20px; }
+  .seqgrid { display: grid; grid-template-columns: 96px repeat(10, minmax(0, 1fr)); gap: 6px; align-items: center; }
+  .rowlabel { font: 600 .75rem "JetBrains Mono", monospace; color: var(--muted); text-transform: uppercase; }
+  .pad { aspect-ratio: 1; background: var(--surface-2); border: 1px solid var(--line-strong); }
+  .pad.on { background: var(--accent); border-color: var(--accent); }
+  .pad.next { background: none; border: 2px dashed var(--muted); }
+  .years { display: grid; grid-template-columns: 96px repeat(10, minmax(0, 1fr)); gap: 6px; margin-top: 10px; font: 400 .75rem "JetBrains Mono", monospace; color: var(--subtle); }
+  .years span { border-top: 2px solid var(--line-strong); padding-top: 6px; }
+  .colhit { grid-row: 1 / span 5; align-self: stretch; background: none; border: 0; padding: 0; cursor: pointer; position: relative; z-index: 1; }
+  .colhit:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .readout { border: 1px solid var(--line-strong); padding: 20px; }
+  .readout .label { font: 600 .75rem "JetBrains Mono", monospace; color: var(--subtle); text-transform: uppercase; display: flex; justify-content: space-between; }
+  .readout h3 { font: 400 2.25rem/1 "Jersey 10", sans-serif; margin: 12px 0 6px; }
+  .readout p { color: var(--muted); margin: 0 0 14px; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag { font: 400 .75rem "JetBrains Mono", monospace; border: 1px solid var(--muted); color: var(--muted); padding: 2px 7px; }
+  .readout .ctrl { margin-top: 18px; display: flex; gap: 10px; }
+  @media (max-width: 960px) { .seq { grid-template-columns: 1fr; } }
+  @media (max-width: 520px) { .seqgrid, .years { grid-template-columns: 64px repeat(10, minmax(0, 1fr)); gap: 4px; } .grid-wrap { padding: 12px; } .rowlabel { font-size: .625rem; } }
+
+  /* Work */
+  .cards { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; }
+  .card { grid-column: span 2; background: var(--surface); border: 1px solid var(--line-strong); padding: 22px; display: flex; flex-direction: column; text-decoration: none; transition: border-color .2s; }
+  .card:nth-child(-n+2) { grid-column: span 3; }
+  .card:hover { border-color: var(--accent); }
+  .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; font: 400 .8125rem "JetBrains Mono", monospace; color: var(--subtle); }
+  .card h3 { font: 400 2rem/1 "Jersey 10", sans-serif; margin: 0 0 8px; }
+  .card p { color: var(--muted); margin: 0 0 22px; }
+  .metric { margin-top: auto; padding-top: 18px; border-top: 1px solid var(--line-strong); display: flex; align-items: baseline; gap: 12px; margin-bottom: 16px; }
+  .metric b { font: 400 3rem/1 "Jersey 10", sans-serif; color: var(--accent); }
+  .metric span { color: var(--muted); font-size: .9375rem; line-height: 1.3; }
+  .status { font: 600 .6875rem "JetBrains Mono", monospace; background: var(--accent-soft); color: var(--accent); padding: 3px 7px; text-transform: uppercase; }
+  @media (max-width: 900px) { .cards { grid-template-columns: 1fr 1fr; } .card, .card:nth-child(-n+2) { grid-column: span 1; } }
+  @media (max-width: 600px) { .cards { grid-template-columns: 1fr; } }
+  .more { margin-top: 40px; border-top: 2px solid var(--ink); }
+  .more a { display: grid; grid-template-columns: 1fr auto; gap: 16px; padding: 16px 4px; border-bottom: 1px solid var(--line-strong); text-decoration: none; align-items: baseline; }
+  .more a:hover { background: var(--surface); }
+  .more b { font: 400 1.5rem/1.1 "Jersey 10", sans-serif; }
+  .more span { font: 400 .875rem "JetBrains Mono", monospace; color: var(--accent); text-align: right; }
+  @media (max-width: 600px) { .more a { grid-template-columns: 1fr; gap: 4px; } .more span { text-align: left; } }
+
+  /* About */
+  .about { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
+  .about p.big { font-size: 1.375rem; line-height: 1.45; margin: 0 0 18px; max-width: 34ch; }
+  .about p.small { color: var(--muted); margin: 0; max-width: 46ch; }
+  .nums { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line-strong); border: 1px solid var(--line-strong); }
+  .nums div { background: var(--bg); padding: 20px; }
+  .nums b { display: block; font: 400 3.25rem/1 "Jersey 10", sans-serif; }
+  .nums span { color: var(--muted); font-size: .9375rem; }
+  .creds { list-style: none; padding: 0; margin: 28px 0 0; }
+  .creds li { display: flex; justify-content: space-between; gap: 16px; padding: 10px 0; border-bottom: 1px solid var(--line-strong); }
+  .creds span { font: 400 .8125rem "JetBrains Mono", monospace; color: var(--subtle); white-space: nowrap; }
+  @media (max-width: 860px) { .about { grid-template-columns: 1fr; } }
+
+  /* Contact */
+  .tbc { border-bottom: 2px dashed var(--accent); }
+  .contact { padding: 120px 0 40px; text-align: left; }
+  .contact h2 { font-size: clamp(4rem, 12vw, 9rem); margin-bottom: 20px; }
+  .contact p { color: var(--muted); margin: 0 0 32px; font-size: 1.25rem; }
+  footer.site { border-top: 1px solid var(--line); margin-top: 80px; padding: 28px 0 40px; color: var(--muted); font-size: .9375rem; }
+  footer.site .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: space-between; align-items: center; }
+  footer.site nav { display: flex; gap: 20px; flex-wrap: wrap; }
+  footer.site a { color: var(--muted); }
+
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .card { transition: none; } }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Juan Camilo Muñoz, home"><span data-mark="28"></span><b>Juan Camilo Muñoz</b></a>
+    <nav class="main" aria-label="Main"><a href="#work">Work</a><a href="#about">About</a><a href="#contact">Contact</a></nav>
+    <div class="tgls" style="display:flex;gap:6px">
+      <button class="tgl" id="lang" type="button" aria-label="Cambiar a español">ES</button>
+      <button class="tgl" id="theme" type="button" aria-pressed="false">Light</button>
+    </div>
+    <a class="btn btn-primary btn-sm" href="#">Download CV</a>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero" id="top">
+    <div class="wrap">
+      <div>
+        <div class="route">GET /juan-camilo <span>200 OK</span></div>
+        <h1>Juan Camilo<br>Muñoz</h1>
+        <p class="tagline" data-i18n="tagline">I follow every decision through the whole system.</p>
+        <p class="meta" data-i18n="meta">Software Engineering student at Universidad Icesi, Cali, Colombia.</p>
+        <div class="avail"><span class="dot" aria-hidden="true"></span><span data-i18n="avail">Open to internships from January 2027</span></div>
+        <div class="ctas">
+          <a class="btn btn-primary" href="#" data-i18n="cv">Download CV</a>
+          <a class="btn btn-ghost" href="mailto:juancamuba.swe@gmail.com?subject=Internship%20opportunity" data-i18n="email">Email me</a>
+        </div>
+      </div>
+      <div class="hero-mark" data-mark="animated" aria-hidden="true"></div>
+    </div>
+  </section>
+
+  <section class="block" id="range" aria-labelledby="range-title">
+    <div class="wrap">
+      <div class="route">GET /range</div>
+      <h2 id="range-title">Every project, every layer</h2>
+      <div class="seq">
+        <div class="grid-wrap">
+          <div class="seqgrid" id="seqgrid"></div>
+          <div class="years" aria-hidden="true">
+            <span></span><span style="grid-column: span 3">2025</span><span style="grid-column: span 6">2026</span><span>Next</span>
+          </div>
+        </div>
+        <div class="readout" aria-live="polite">
+          <div class="label"><span>Now playing</span><span id="ro-n">07 / 10</span></div>
+          <h3 id="ro-title">CircleGuard</h3>
+          <p id="ro-goal">Campus contact tracing that keeps identities anonymous.</p>
+          <div class="tags" id="ro-tags"></div>
+          <div class="ctrl"><button class="tgl" id="play" type="button" aria-pressed="true">Pause</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="work" aria-labelledby="work-title">
+    <div class="wrap">
+      <div class="route">GET /work</div>
+      <h2 id="work-title">Selected work</h2>
+      <div class="cards" id="cards"></div>
+      <div class="more" id="more"></div>
+    </div>
+  </section>
+
+  <section class="block" id="about" aria-labelledby="about-title">
+    <div class="wrap">
+      <div class="route">GET /about</div>
+      <h2 id="about-title">From the data model to the product</h2>
+      <div class="about">
+        <div>
+          <p class="big">I see software end to end, so I can join any stage of a project and turn a complex requirement into a technical plan.</p>
+          <p class="small">Where I'm heading: software architecture and data-intensive systems. Spanish is my native language.</p>
+        </div>
+        <div>
+          <div class="nums">
+            <div><b>4.6</b><span>GPA out of 5.0</span></div>
+            <div><b>8</b><span>semesters on the Dean's List</span></div>
+            <div><b>B2</b><span>English, working toward C1</span></div>
+            <div><b>2027</b><span>graduation, August</span></div>
+          </div>
+          <ul class="creds">
+            <li>AWS Academy Cloud Architecting<span>Nov 2026</span></li>
+            <li>Google Cloud Computing Foundations<span>Oct 2026</span></li>
+            <li>Introduction to MongoDB<span>Apr 2025</span></li>
+            <li>Scrum Foundation Professional<span>Feb 2024</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact" id="contact" aria-labelledby="contact-title">
+    <div class="wrap">
+      <div class="route">POST /contact</div>
+      <h2 id="contact-title">Let's talk.</h2>
+      <p>Internship from January 2027, <span class="tbc" title="To confirm">remote or on site</span>.</p>
+      <div class="ctas">
+        <a class="btn btn-primary" href="mailto:juancamuba.swe@gmail.com?subject=Internship%20opportunity">juancamuba.swe@gmail.com</a>
+        <button class="btn btn-ghost" type="button" id="copy">Copy email</button>
+        <a class="btn btn-ghost" href="https://linkedin.com/in/juancamuba">LinkedIn</a>
+        <a class="btn btn-ghost" href="https://github.com/JuanCamiloMunozB">GitHub</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <span class="brand"><span data-mark="20"></span>Juan Camilo Muñoz Barco</span>
+    <nav aria-label="Footer"><a href="#">CV English</a><a href="#">CV Español</a><a href="https://github.com/JuanCamiloMunozB">GitHub</a><a href="https://linkedin.com/in/juancamuba">LinkedIn</a></nav>
+  </div>
+</footer>
+
+<script>
+const NS = 'http://www.w3.org/2000/svg';
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// Logo: 4x4 pads, lit pads draw a J
+const J = ['0111', '0010', '1010', '1110'];
+function mark(size) {
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('viewBox', '0 0 19 19'); svg.setAttribute('class', 'pads'); svg.setAttribute('aria-hidden', 'true');
+  if (size) { svg.setAttribute('width', size); svg.setAttribute('height', size); }
+  const cells = [];
+  for (let r = 0; r < 4; r++) for (let c = 0; c < 4; c++) {
+    const e = document.createElementNS(NS, 'rect');
+    e.setAttribute('x', c * 5); e.setAttribute('y', r * 5); e.setAttribute('width', 4); e.setAttribute('height', 4);
+    e.style.fill = J[r][c] === '1' ? 'var(--accent)' : 'var(--line-strong)';
+    svg.appendChild(e); cells.push({ e, r, c, on: J[r][c] === '1' });
+  }
+  return { svg, cells };
+}
+document.querySelectorAll('[data-mark]').forEach(el => {
+  const v = el.dataset.mark;
+  const m = mark(v === 'animated' ? null : +v);
+  el.appendChild(m.svg);
+  // Hero: a playhead sweeps the columns once, then the J settles
+  if (v === 'animated' && !reduce) {
+    m.cells.forEach(x => x.e.style.fill = 'var(--line-strong)');
+    let col = 0;
+    const t = setInterval(() => {
+      m.cells.forEach(x => { if (x.c === col) x.e.style.fill = x.on ? 'var(--accent)' : 'var(--muted)'; if (x.c === col - 1 && !x.on) x.e.style.fill = 'var(--line-strong)'; });
+      if (++col > 4) clearInterval(t);
+    }, 220);
+  }
+});
+
+// Projects (facts only). Layers: Backend, Data, Distributed, Cloud, Product
+const LAYERS = ['Backend', 'Data', 'Distributed', 'Cloud', 'Product'];
+const P = [
+  { id: 'jugandoando', t: 'JugandoAndo', y: '2025', L: [0, 4], g: 'E-commerce platform: catalog, cart, orders and promotions.', tags: ['Java', 'Spring Boot', 'React', 'PostgreSQL'], m: ['80', 'REST endpoints, approximately'], lead: 5 },
+  { id: 'bakery', t: 'Bakery accounting system', y: '2025', L: [0, 4], g: 'Accounting, reports and roles for a small business.', tags: ['NestJS', 'Next.js', 'PostgreSQL'], m: ['48', 'endpoints'] },
+  { id: 'har', t: 'Human activity recognition', y: '2025', L: [1], g: 'Video turned into motion features to classify 4 activities.', tags: ['Python', 'MediaPipe', 'scikit-learn'], m: ['0.935', 'macro F1'] },
+  { id: 'postgrados', t: 'Postgrados', y: '2026', L: [0, 2, 4], g: 'One planning lifecycle to replace spreadsheet coordination at a graduate office.', tags: ['Java', 'Spring Boot', 'React', 'PostgreSQL'], m: ['80.88%', 'test coverage on my components'], lead: 4 },
+  { id: 'irl', t: 'IRL Diagnostic System', y: '2026', L: [0, 3, 4], g: "Scores a team's innovation readiness and links each gap to INNLAB services.", tags: ['NestJS', 'React', 'AWS Cognito'], m: ['23', 'user stories in the backlog'], status: 'In progress', lead: 3 },
+  { id: 'cloud', t: 'Cloud patterns and CI/CD', y: '2026', L: [2, 3], g: 'Kafka messaging, a circuit breaker and a pipeline that ships versioned images.', tags: ['Kafka', 'Go', 'GitHub Actions'], m: ['3', 'services validated by my pipeline'] },
+  { id: 'circleguard', t: 'CircleGuard', y: '2026', L: [0, 2, 3], g: 'Campus contact tracing that keeps identities anonymous.', tags: ['Java', 'Kafka', 'Neo4j', 'Kubernetes', 'Terraform'], m: ['2,588', 'load-test requests, 0 failures'], lead: 1 },
+  { id: 'churn', t: 'Churn prediction and monitoring', y: '2026', L: [1, 3], g: 'A churn model served as an API, with bias audit and drift alerts.', tags: ['Python', 'Airflow', 'BigQuery', 'Cloud Run'], m: ['0.837', 'AUC'], lead: 2 },
+  { id: 'ciencia', t: 'Ciencia a tu tesis', y: '2026', L: [1], g: 'Search and reranking over a catalog of 108,252 papers.', tags: ['Python', 'OpenAlex', 'SciELO'], m: ['0.900', 'MRR@10, baseline 0.640'] },
+  { id: 'next', t: 'Currently building', y: 'Next', L: [], g: 'A data-intensive system for a problem from my own life. Details coming.', tags: [], m: null },
+];
+
+// Sequencer grid
+const grid = document.getElementById('seqgrid');
+LAYERS.forEach((name, r) => {
+  const lab = document.createElement('div'); lab.className = 'rowlabel'; lab.textContent = name; lab.style.gridRow = r + 1; grid.appendChild(lab);
+  P.forEach((p, c) => {
+    const d = document.createElement('div');
+    d.className = 'pad' + (p.id === 'next' ? ' next' : p.L.includes(r) ? ' on' : '');
+    d.style.gridRow = r + 1; d.style.gridColumn = c + 2; d.dataset.col = c; grid.appendChild(d);
+  });
+});
+P.forEach((p, c) => {
+  const b = document.createElement('button'); b.className = 'colhit'; b.type = 'button';
+  b.style.gridColumn = c + 2; b.setAttribute('aria-label', `${p.t}, ${p.y}`);
+  b.addEventListener('click', () => { stop(); show(c); });
+  b.addEventListener('focus', () => { stop(); show(c); });
+  grid.appendChild(b);
+});
+const roN = document.getElementById('ro-n'), roT = document.getElementById('ro-title'), roG = document.getElementById('ro-goal'), roTags = document.getElementById('ro-tags');
+let cur = 6;
+function show(c) {
+  cur = c; const p = P[c];
+  grid.querySelectorAll('.pad').forEach(el => { el.style.borderColor = +el.dataset.col === c ? 'var(--ink)' : ''; el.style.boxShadow = +el.dataset.col === c && el.classList.contains('on') ? '0 0 0 2px var(--ink)' : ''; });
+  roN.textContent = String(c + 1).padStart(2, '0') + ' / ' + String(P.length).padStart(2, '0');
+  roT.textContent = p.t; roG.textContent = p.g;
+  roTags.innerHTML = p.tags.map(t => `<span class="tag">${t}</span>`).join('');
+}
+const playBtn = document.getElementById('play');
+let timer = null;
+function start() { timer = setInterval(() => show((cur + 1) % P.length), 2000); playBtn.textContent = 'Pause'; playBtn.setAttribute('aria-pressed', 'true'); }
+function stop() { clearInterval(timer); timer = null; playBtn.textContent = 'Play'; playBtn.setAttribute('aria-pressed', 'false'); }
+playBtn.addEventListener('click', () => timer ? stop() : start());
+show(cur);
+if (reduce) stop(); else start();
+
+// Work cards: the 5 leads, each with its own pad column
+function strip(L) {
+  const svg = document.createElementNS(NS, 'svg'); svg.setAttribute('viewBox', '0 0 24 4'); svg.setAttribute('width', 96); svg.setAttribute('height', 16); svg.setAttribute('class', 'pads');
+  svg.setAttribute('role', 'img'); svg.setAttribute('aria-label', 'Layers: ' + L.map(i => LAYERS[i]).join(', '));
+  LAYERS.forEach((_, i) => { const e = document.createElementNS(NS, 'rect'); e.setAttribute('x', i * 5); e.setAttribute('y', 0); e.setAttribute('width', 4); e.setAttribute('height', 4); e.style.fill = L.includes(i) ? 'var(--accent)' : 'var(--line-strong)'; svg.appendChild(e); });
+  return svg.outerHTML;
+}
+const leads = P.filter(p => p.lead).sort((a, b) => a.lead - b.lead);
+document.getElementById('cards').innerHTML = leads.map(p => `
+  <a class="card" href="#">
+    <div class="card-top">${strip(p.L)}<span>${p.status ? `<span class="status">${p.status}</span> ` : ''}${p.y}</span></div>
+    <h3>${p.t}</h3>
+    <p>${p.g}</p>
+    <div class="metric"><b>${p.m[0]}</b><span>${p.m[1]}</span></div>
+    <div class="tags">${p.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+  </a>`).join('');
+document.getElementById('more').innerHTML = P.filter(p => !p.lead && p.m).map(p => `
+  <a href="#"><b>${p.t}</b><span>${p.m[0]} ${p.m[1]}</span></a>`).join('');
+
+// Theme
+const themeBtn = document.getElementById('theme');
+themeBtn.addEventListener('click', () => {
+  const light = document.documentElement.dataset.theme !== 'light';
+  document.documentElement.dataset.theme = light ? 'light' : 'dark';
+  themeBtn.textContent = light ? 'Dark' : 'Light'; themeBtn.setAttribute('aria-pressed', String(light));
+});
+
+// Hero language preview (the real site uses separate pre-rendered pages)
+const es = { tagline: 'Sigo cada decisión a través de todo el sistema.', meta: 'Estudiante de Ingeniería de Sistemas en la Universidad Icesi, Cali, Colombia.', avail: 'Disponible para práctica desde enero de 2027', cv: 'Descargar CV', email: 'Escríbeme' };
+const en = {}; document.querySelectorAll('[data-i18n]').forEach(el => en[el.dataset.i18n] = el.textContent);
+const langBtn = document.getElementById('lang');
+langBtn.addEventListener('click', () => {
+  const toEs = document.documentElement.lang === 'en', d = toEs ? es : en;
+  document.querySelectorAll('[data-i18n]').forEach(el => el.textContent = d[el.dataset.i18n]);
+  document.documentElement.lang = toEs ? 'es' : 'en'; langBtn.textContent = toEs ? 'EN' : 'ES';
+  langBtn.setAttribute('aria-label', toEs ? 'Switch to English' : 'Cambiar a español');
+});
+
+document.getElementById('copy').addEventListener('click', async e => {
+  try { await navigator.clipboard.writeText('juancamuba.swe@gmail.com'); e.target.textContent = 'Copied'; } catch {}
+});
+</script>
+</body>
+</html>

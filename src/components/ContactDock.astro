@@ -1,0 +1,16 @@
+---
+/** Always-visible contact: a vertical rail on the left on desktop, a bottom bar on phones. */
+import Icon from './Icon.astro';
+import { t, type Lang } from '../i18n/ui';
+import { SITE, localized } from '../data/site';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const mail = `mailto:${SITE.email}?subject=${encodeURIComponent(t('emailSubject', lang))}`;
+---
+<nav class="dock" aria-label={t('navContact', lang)}>
+  <a href={mail} aria-label={`Email ${SITE.email}`} data-tip="Email"><Icon name="mail" /></a>
+  <a href={SITE.linkedin} aria-label="LinkedIn" data-tip="LinkedIn"><Icon name="linkedin" /></a>
+  <a href={SITE.github} aria-label="GitHub" data-tip="GitHub"><Icon name="github" /></a>
+  <a href={localized(lang, 'cv/')} aria-label={t('viewCv', lang)} data-tip={t('viewCv', lang)}><Icon name="cv" /></a>
+</nav>
+<a class="mail-rail" href={mail}>{SITE.email}</a>

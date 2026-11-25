@@ -1,0 +1,32 @@
+---
+/**
+ * One skill area: pixel area icon, a grid of one-color tool logos (Simple Icons, CC0)
+ * drawn in the theme's muted color on a transparent tile, and concept tags.
+ */
+import Scene from './Scene.astro';
+import { logo } from '../data/logos';
+import type { SkillArea } from '../data/skills';
+import { tx, t, type Lang } from '../i18n/ui';
+
+interface Props { area: SkillArea; lang: Lang; evidence: { href: string; title: string }[] }
+const { area, lang, evidence } = Astro.props;
+
+const tiles = area.tools.flatMap((n) => { const l = logo(n); return l ? [{ name: n, ...l }] : []; });
+const tags = area.tools.filter((n) => !tiles.some((x) => x.name === n));
+---
+<article class="skill">
+  <header>
+    <div class="icon"><Scene name={area.icon} /></div>
+    <h3>{tx(area.title, lang)}</h3>
+  </header>
+  <ul class="tiles">
+    {tiles.map((x) => (
+      <li class="tile" data-tile>
+        <svg viewBox={x.viewBox} aria-hidden="true"><path d={x.d} /></svg>
+        <span>{x.name}</span>
+      </li>
+    ))}
+  </ul>
+  {tags.length > 0 && <ul class="concepts">{tags.map((n) => <li>{n}</li>)}</ul>}
+  <div class="ev">{t('seenIn', lang)}: {evidence.map((e, i) => <>{i > 0 && ', '}<a href={e.href}>{e.title}</a></>)}</div>
+</article>
