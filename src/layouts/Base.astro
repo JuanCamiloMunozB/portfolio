@@ -52,6 +52,11 @@ const ld = {
   <meta property="og:type" content="website" />
   <meta property="og:url" content={abs(lang)} />
   <meta property="og:locale" content={lang === 'es' ? 'es_CO' : 'en_US'} />
+  <meta property="og:image" content={new URL(url('og.png'), Astro.site).href} />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="627" />
+  <meta property="og:image:alt" content="Juan Camilo Muñoz Barco, Backend and Distributed Systems Engineer. Open to internships from 2027-1." />
+  <meta name="twitter:card" content="summary_large_image" />
   <meta name="theme-color" content="#1b1b1b" />
   <script type="application/ld+json" set:html={JSON.stringify(ld)} />
   <script is:inline>
